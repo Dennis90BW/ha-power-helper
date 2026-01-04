@@ -11,7 +11,7 @@ from homeassistant.helpers.event import async_track_state_change_event
 from homeassistant.helpers.entity import DeviceInfo, EntityCategory
 from homeassistant.const import UnitOfPower
 
-from ...const import DOMAIN
+from .const import DOMAIN
 
 # =====================================================================
 # HELPERS
