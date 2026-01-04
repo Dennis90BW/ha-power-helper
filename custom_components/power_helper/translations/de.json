@@ -17,7 +17,7 @@
           "netz_einspeisung": "Netzeinspeisung"
         },
         "data_description": {
-          "netz_leistung": "Gesamtleistung am Stromzähler. Kann in W oder kW angegeben werden.\nPositiver Wert: Netzbezug.\nNegativer Wert: Netzeinspeisung.\n\n",
+          "netz_leistung": "Gesamtleistung am Stromzähler. Kann in W oder kW angegeben werden.\nPositiver Wert: Netzbezug.\nNegativer Wert: Netzeinspeisung.",
           "netz_bezug": "Leistung, die am Stromzähler bezogen wird. Kann in W oder kW angegeben werden.\nDer Wert muss immer positiv sein.",
           "netz_einspeisung": "Leistung, die am Stromzähler eingespeist wird. Kann in W oder kW angegeben werden.\nDer Wert muss immer positiv sein."
         }
@@ -44,7 +44,7 @@
         },
         "data_description": {
           "akku_leistung": "Gesamtleistung des Akkus. Kann in W oder kW angegeben werden.\nPositiver Wert: Akku entlädt sich.\nNegativer Wert: Akku lädt auf.",
-          "akku_leistung_invertiert": "Positiver Wert: Akku lädt auf.\nNegativer Wert: Akku entlädt sich.\n\n",
+          "akku_leistung_invertiert": "Positiver Wert: Akku lädt auf.\nNegativer Wert: Akku entlädt sich.",
           "akku_laden": "Leistung, mit der der Akku geladen wird. Kann in W oder kW angegeben werden.\nDer Wert muss immer positiv sein.",
           "akku_entladen": "Leistung, mit der der Akku entladen wird. Kann in W oder kW angegeben werden.\nDer Wert muss immer positiv sein.",
           "akku_prio": "Bspw. für Akkus mit DC-Anschluss und direkter Verbindung zu den PV-Modulen.\nStandard ist: PV Leistung versorgt zuerst das Haus und bei Überschuss den Akku."

@@ -17,7 +17,7 @@
           "netz_einspeisung": "Grid feed-in"
         },
         "data_description": {
-          "netz_leistung": "Total power at the electricity meter. Can be provided in W or kW.\nPositive value: grid consumption.\nNegative value: grid feed-in.\n\n",
+          "netz_leistung": "Total power at the electricity meter. Can be provided in W or kW.\nPositive value: grid consumption.\nNegative value: grid feed-in.",
           "netz_bezug": "Power consumed from the grid. Can be provided in W or kW.\nThe value must always be positive.",
           "netz_einspeisung": "Power fed into the grid. Can be provided in W or kW.\nThe value must always be positive."
         }
@@ -44,7 +44,7 @@
         },
         "data_description": {
           "akku_leistung": "Total battery power. Can be provided in W or kW.\nPositive value: battery is discharging.\nNegative value: battery is charging.",
-          "akku_leistung_invertiert": "Positive value: battery is discharging.\nNegative value: battery is charging.\n\n",
+          "akku_leistung_invertiert": "Positive value: battery is discharging.\nNegative value: battery is charging.",
           "akku_laden": "Power at which the battery is being charged. Can be provided in W or kW.\nThe value must always be positive.",
           "akku_entladen": "Power at which the battery is being discharged. Can be provided in W or kW.\nThe value must always be positive.",
           "akku_prio": "The battery is supplied with PV power first, and the house is supplied afterwards.\n\nFor example, for batteries with a DC connection and a direct link to the PV modules.\nDefault behavior: PV power supplies the house first and charges the battery with surplus energy."

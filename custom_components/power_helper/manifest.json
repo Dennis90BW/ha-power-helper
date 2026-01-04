@@ -8,7 +8,6 @@
   "dependencies": [],
   "iot_class": "local_polling",
   "integration_type": "device",
-  "translation_key": "power_helper",
   "codeowners": ["@Dennis90BW"],
   "config_flow": true
 }
