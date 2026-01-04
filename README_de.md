@@ -4,7 +4,7 @@
 
 **powerHELPER** ist eine Custom Integration für **Home Assistant**, mit der elektrische Leistungsflüsse zwischen **PV-Anlage, Netz, Akku und Haus** automatisch aufgeschlüsselt werden.
 
-Ideal für Nutzer von [Solar Forecast ML](https://github.com/Zara-Toorox/ha-solar-forecast-ml) und [SFML-Stats](https://github.com/Zara-Toorox/sfml-stats) von @Zara-Toorox.
+Ideal für Nutzer von [Solar Forecast ML](https://github.com/Zara-Toorox/ha-solar-forecast-ml) und [SFML-Stats](https://github.com/Zara-Toorox/sfml-stats). Danke @Zara-Toorox für diese tollen Integrationen!
 
 ---
 
