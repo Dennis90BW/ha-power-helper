@@ -1,13 +1,13 @@
 {
   "domain": "power_helper",
   "name": "powerHELPER",
-  "version": "1.0.1",
+  "codeowners": ["@Dennis90BW"],
+  "config_flow": true,
+  "dependencies": [],
   "documentation": "https://github.com/Dennis90BW/ha-power-helper",
+  "integration_type": "device",
+  "iot_class": "local_polling",
   "issue_tracker": "https://github.com/Dennis90BW/ha-power-helper/issues",
   "requirements": [],
-  "dependencies": [],
-  "iot_class": "local_polling",
-  "integration_type": "device",
-  "codeowners": ["@Dennis90BW"],
-  "config_flow": true
+  "version": "1.0.1"
 }
