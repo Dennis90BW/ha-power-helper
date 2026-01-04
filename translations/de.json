@@ -1,0 +1,57 @@
+{
+  "config": {
+    "step": {
+      "user": {
+        "title": "Willkommen bei deinem powerHELPER",
+        "description": "Lege einen Namen für deine Hausinstallation fest. Dieser Name wird später in der Geräteübersicht angezeigt.\nHinweis: Alle Sensoren müssen die device_class \"power\" besitzen.",
+        "data": {
+          "title": "Name"
+        }
+      },
+      "grid": {
+        "title": "Netz Leistung konfigurieren",
+        "description": "In diesem Schritt wird festgelegt, wie die Leistung am Stromzähler ermittelt wird.\nEs kann entweder ein einzelner Sensor für die gesamte Netzleistung ODER zwei getrennte Sensoren für Netzbezug und Netzeinspeisung verwendet werden.",
+        "data": {
+          "netz_leistung": "Netz Leistung",
+          "netz_bezug": "Netzbezug",
+          "netz_einspeisung": "Netzeinspeisung"
+        },
+        "data_description": {
+          "netz_leistung": "Gesamtleistung am Stromzähler. Kann in W oder kW angegeben werden.\nPositiver Wert: Netzbezug.\nNegativer Wert: Netzeinspeisung.\n\n",
+          "netz_bezug": "Leistung, die am Stromzähler bezogen wird. Kann in W oder kW angegeben werden.\nDer Wert muss immer positiv sein.",
+          "netz_einspeisung": "Leistung, die am Stromzähler eingespeist wird. Kann in W oder kW angegeben werden.\nDer Wert muss immer positiv sein."
+        }
+      },
+      "pv": {
+        "title": "PV Leistung konfigurieren",
+        "description": "OPTIONAL\n\nIn diesem Schritt wird die PV Leistung am Wechselrichter festgelegt.\nHinweis: Wenn kein PV Sensor ausgewählt wird, werden spätere Berechnungen ohne PV Erzeugung durchgeführt und es werden weniger Sensoren erstellt.",
+        "data": {
+          "pv_leistung": "PV Leistung"
+        },
+        "data_description": {
+          "pv_leistung": "Aktuelle Leistung der Photovoltaikanlage. Kann in W oder kW angegeben werden.\nDer Wert muss immer positiv sein."
+        }
+      },
+      "battery": {
+        "title": "Akku Leistung konfigurieren",
+        "description": "OPTIONAL\n\nIn diesem Schritt wird festgelegt, wie die Leistung am Akku ermittelt wird.\nEs kann entweder ein einzelner Sensor für die gesamte Akkuleistung ODER zwei getrennte Sensoren für Laden und Entladen verwendet werden.",
+        "data": {
+          "akku_leistung": "Akku Leistung",
+          "akku_laden": "Akku laden",
+          "akku_entladen": "Akku entladen",
+          "akku_prio": "Akku hat Priorität und bekommt vorrangig PV Leistung. Erst danach wird das Haus versorgt."
+        },
+        "data_description": {
+          "akku_leistung": "Gesamtleistung des Akkus. Kann in W oder kW angegeben werden.\nPositiver Wert: Akku entlädt sich.\nNegativer Wert: Akku lädt auf.\n\n",
+          "akku_laden": "Leistung, mit der der Akku geladen wird. Kann in W oder kW angegeben werden.\nDer Wert muss immer positiv sein.",
+          "akku_entladen": "Leistung, mit der der Akku entladen wird. Kann in W oder kW angegeben werden.\nDer Wert muss immer positiv sein.",
+          "akku_prio": "Bspw. für Akkus mit DC-Anschluss und direkter Verbindung zu den PV-Modulen.\nStandard ist: PV Leistung versorgt zuerst das Haus und bei Überschuss den Akku."
+        }
+      }
+    },
+    "error": {
+      "choose_either_total_or_split": "Bitte entweder einen Gesamtsensor ODER zwei getrennte Sensoren auswählen, nicht beides.",
+      "missing_required_sensors": "Bitte eine gültige Kombination von Sensoren auswählen."
+    }
+  }
+}

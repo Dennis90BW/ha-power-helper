@@ -1,0 +1,57 @@
+{
+  "config": {
+    "step": {
+      "user": {
+        "title": "Welcome to your powerHELPER",
+        "description": "Choose a name for your home installation. This name will later be shown in the device overview.\nNote: All sensors must have the device_class \"power\".",
+        "data": {
+          "title": "Name"
+        }
+      },
+      "grid": {
+        "title": "Configure grid power",
+        "description": "In this step, you define how the power at the electricity meter is determined.\nYou can either use a single sensor for total grid power OR two separate sensors for grid consumption and grid feed-in.",
+        "data": {
+          "netz_leistung": "Grid power",
+          "netz_bezug": "Grid consumption",
+          "netz_einspeisung": "Grid feed-in"
+        },
+        "data_description": {
+          "netz_leistung": "Total power at the electricity meter. Can be provided in W or kW.\nPositive value: grid consumption.\nNegative value: grid feed-in.\n\n",
+          "netz_bezug": "Power consumed from the grid. Can be provided in W or kW.\nThe value must always be positive.",
+          "netz_einspeisung": "Power fed into the grid. Can be provided in W or kW.\nThe value must always be positive."
+        }
+      },
+      "pv": {
+        "title": "Configure PV power",
+        "description": "OPTIONAL\n\nIn this step, the PV power at the inverter is defined.\nNote: If no PV sensor is selected, all subsequent calculations will be performed without PV generation and fewer sensors will be created.",
+        "data": {
+          "pv_leistung": "PV power"
+        },
+        "data_description": {
+          "pv_leistung": "Current power of the photovoltaic system. Can be provided in W or kW.\nThe value must always be positive."
+        }
+      },
+      "battery": {
+        "title": "Configure battery power",
+        "description": "OPTIONAL\n\nIn this step, you define how the battery power is determined.\nYou can either use a single sensor for total battery power OR two separate sensors for charging and discharging.",
+        "data": {
+          "akku_leistung": "Battery power",
+          "akku_laden": "Battery charging",
+          "akku_entladen": "Battery discharging",
+          "akku_prio": "Battery priority"
+        },
+        "data_description": {
+          "akku_leistung": "Total battery power. Can be provided in W or kW.\nPositive value: battery is discharging.\nNegative value: battery is charging.\n\n",
+          "akku_laden": "Power at which the battery is being charged. Can be provided in W or kW.\nThe value must always be positive.",
+          "akku_entladen": "Power at which the battery is being discharged. Can be provided in W or kW.\nThe value must always be positive.",
+          "akku_prio": "The battery is supplied with PV power first, and the house is supplied afterwards.\n\nFor example, for batteries with a DC connection and a direct link to the PV modules.\nDefault behavior: PV power supplies the house first and charges the battery with surplus energy."
+        }
+      }
+    },
+    "error": {
+      "choose_either_total_or_split": "Please choose either a total sensor OR two separate sensors, not both.",
+      "missing_required_sensors": "Please select a valid combination of sensors."
+    }
+  }
+}
