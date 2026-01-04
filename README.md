@@ -59,11 +59,8 @@ This is my first GitHub project, and the custom integration was created with the
 1. **Settings → Devices & Services**
 2. **Add Integration**
 3. Select **powerHELPER**
-4. Select your power sensors
-
-The integration automatically detects:
-- combined grid power  
-- or separate import & export sensors
+4. Set device name
+5. Select your power sensors
 
 ---
 

@@ -59,11 +59,8 @@ Dies ist mein erstes GitHub-Projekt und die Custom Integration wurde mithilfe vo
 1. **Einstellungen → Geräte & Dienste**
 2. **Integration hinzufügen**
 3. **powerHELPER** auswählen
-4. Leistungssensoren auswählen
-
-Die Integration erkennt automatisch:
-- kombinierte Netzleistung
-- oder getrennte Sensoren für Bezug & Einspeisung
+4. Gerätenamen festlegen
+5. Leistungssensoren auswählen
 
 ---
 
