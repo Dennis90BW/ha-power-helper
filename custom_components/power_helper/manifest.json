@@ -1,7 +1,7 @@
 {
   "domain": "power_helper",
   "name": "powerHELPER",
-  "version": "1.0.0",
+  "version": "1.0.1",
   "documentation": "https://github.com/Dennis90BW/ha-power-helper",
   "issue_tracker": "https://github.com/Dennis90BW/ha-power-helper/issues",
   "requirements": [],
