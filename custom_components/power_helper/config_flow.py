@@ -23,6 +23,7 @@ CONF_BAT_POWER = "akku_leistung"
 CONF_BAT_CHARGE = "akku_laden"
 CONF_BAT_DISCHARGE = "akku_entladen"
 CONF_BAT_PRIO = "akku_prio"
+CONF_BAT_INVERTED = "akku_leistung_invertiert"
 
 
 class PowerHelperConfigFlow(config_entries.ConfigFlow, domain=DOMAIN):
@@ -124,6 +125,7 @@ class PowerHelperConfigFlow(config_entries.ConfigFlow, domain=DOMAIN):
         schema = vol.Schema(
             {
                 vol.Optional(CONF_BAT_POWER): self._power_selector(),
+                vol.Optional(CONF_BAT_INVERTED, default=False): bool,
                 vol.Optional(CONF_BAT_CHARGE): self._power_selector(),
                 vol.Optional(CONF_BAT_DISCHARGE): self._power_selector(),
                 vol.Optional(CONF_BAT_PRIO, default=False): bool,

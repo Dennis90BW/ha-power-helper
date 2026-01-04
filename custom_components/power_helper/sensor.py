@@ -17,8 +17,9 @@ from .const import DOMAIN
 # HELPERS
 # =====================================================================
 
-def power_in_watt(hass: HomeAssistant, entity_id: str) -> float:
+def power_in_watt(hass: HomeAssistant, entry: ConfigEntry, entity_id: str) -> float:
     """Return power in Watt, normalized from W / kW."""
+    data = entry.data
     try:
         state = hass.states.get(entity_id)
         if state is None or state.state in (None, "unknown", "unavailable"):
@@ -29,6 +30,12 @@ def power_in_watt(hass: HomeAssistant, entity_id: str) -> float:
 
         if unit in (UnitOfPower.KILO_WATT, "kW"):
             return value * 1000
+        
+        # Akku-Invertierung
+        if entity_id == data.get("akku_leistung"):
+            invert = data.get("akku_leistung_invertiert", False)
+            if invert:
+                return -value
 
         return value
     except Exception:
@@ -167,9 +174,9 @@ class BasePhSensor(SensorEntity):
         self._attr_device_info = DeviceInfo(
             identifiers={(DOMAIN, entry.entry_id)},
             name=entry.title,
-            manufacturer="Dennis",
+            manufacturer="Dennis90BW",
             model="powerHELPER",
-            sw_version="1.0.0",
+            sw_version="1.0.1",
         )
 
 
@@ -194,7 +201,7 @@ class ProxyPowerSensor(BasePhSensor):
         self._update()
 
     def _update(self):
-        self._attr_native_value = power_in_watt(self.hass, self._source)
+        self._attr_native_value = power_in_watt(self.hass, self._entry, self._source)
         self.async_write_ha_state()
 
 
@@ -218,7 +225,7 @@ class SplitPowerSensor(BasePhSensor):
         self._update()
 
     def _update(self):
-        value = power_in_watt(self.hass, self._source)
+        value = power_in_watt(self.hass, self._entry, self._source)
         self._attr_native_value = max(value, 0) if self._positive else max(-value, 0)
         self.async_write_ha_state()
 
@@ -239,8 +246,8 @@ class CombinedPowerSensor(BasePhSensor):
         self._update()
 
     def _update(self):
-        pos = power_in_watt(self.hass, self._pos)
-        neg = power_in_watt(self.hass, self._neg)
+        pos = power_in_watt(self.hass, self._entry, self._pos)
+        neg = power_in_watt(self.hass, self._entry, self._neg)
         self._attr_native_value = pos - neg
         self.async_write_ha_state()
 
@@ -267,7 +274,7 @@ class FlowPowerSensor(BasePhSensor):
     @callback
     def _update(self, event=None):
         def val(e):
-            return power_in_watt(self.hass, e) if e else 0.0
+            return power_in_watt(self.hass, self._entry, e) if e else 0.0
 
         netz = val(self._sources["netz"])
         pv = val(self._sources["pv"])
@@ -295,15 +302,15 @@ class FlowPowerSensor(BasePhSensor):
         akku_prio = self._entry.data.get("akku_prio", False)
 
         if akku_prio:
-            pv_zu_akku = min(pv, al)
-            pv_zu_haus = min(max(pv - pv_zu_akku, 0), haus)
+            pv_zu_akku = max(min(pv, al),0)
+            pv_zu_haus = max(min(max(pv - pv_zu_akku, 0), haus),0)
         else:
-            pv_zu_haus = min(pv, haus)
-            pv_zu_akku = min(max(pv - pv_zu_haus, 0), al)
+            pv_zu_haus = max(min(pv, haus),0)
+            pv_zu_akku = max(min(max(pv - pv_zu_haus, 0), al),0)
 
         pv_zu_netz = max(pv - pv_zu_haus - pv_zu_akku, 0)
 
-        akku_zu_haus = min(ae, haus - pv_zu_haus)
+        akku_zu_haus = max(min(ae, haus - pv_zu_haus),0)
         akku_zu_netz = max(ae - akku_zu_haus, 0)
 
         netz_zu_haus = max(haus - pv_zu_haus - akku_zu_haus, 0)

@@ -17,6 +17,7 @@ Dies ist mein erstes GitHub-Projekt und die Custom Integration wurde mithilfe vo
 
 - 🧩 Erstellt automatisch fehlende **kombinierte oder getrennte Leistungssensoren** für **Netz-** und **Akkuleistung**
 - 🔌 Aufteilung von Leistungsflüssen (PV, Netz, Akku, Haus)
+- 🔋 Akku-Leistung kann invertiert werden
 - ⚙️ Einfache Einrichtung über die UI
 - 📊 Ausgabe in **Watt (W)**
 - 🔄 Unterstützt Sensoren in **W** und **kW**
@@ -67,22 +68,30 @@ Dies ist mein erstes GitHub-Projekt und die Custom Integration wurde mithilfe vo
 ## 🧠 Erzeugte Sensoren
 
 ### 🔌 Netz
+
+#### Input
 - `sensor.netz_leistung` — Netz Leistung
 - `sensor.netz_bezug` — Netzbezug
 - `sensor.netz_einspeisung` — Netzeinspeisung
+#### Leistungsfluss
 - `sensor.netz_zu_haus` — Netz → Haus
 - `sensor.netz_zu_akku` — Netz → Akku
 
 ### ☀️ PV
+
+#### Input
 - `sensor.pv_leistung` — PV Leistung
+#### Leistungsfluss
 - `sensor.pv_zu_haus` — PV → Haus
 - `sensor.pv_zu_akku` — PV → Akku
 - `sensor.pv_zu_netz` — PV → Netz
 
 ### 🔋 Akku
+#### Input
 - `sensor.akku_leistung` — Akku Leistung
 - `sensor.akku_laden` — Akku laden
 - `sensor.akku_entladen` — Akku entladen
+#### Leistungsfluss
 - `sensor.akku_zu_haus` — Akku → Haus
 - `sensor.akku_zu_netz` — Akku → Netz
 
@@ -95,7 +104,7 @@ Alle Sensoren liefern **Watt (W)** und sind Dashboard-fähig.
 
 ## 🧪 Status
 
-Version: **1.0.0**
+Version: **1.0.1**
 
 Getestet mit PV + Akku Systemen
 

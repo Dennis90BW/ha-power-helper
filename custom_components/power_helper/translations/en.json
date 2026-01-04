@@ -37,12 +37,14 @@
         "description": "OPTIONAL\n\nIn this step, you define how the battery power is determined.\nYou can either use a single sensor for total battery power OR two separate sensors for charging and discharging.",
         "data": {
           "akku_leistung": "Battery power",
+          "akku_leistung_invertiert": "Change sign",
           "akku_laden": "Battery charging",
           "akku_entladen": "Battery discharging",
           "akku_prio": "Battery priority"
         },
         "data_description": {
-          "akku_leistung": "Total battery power. Can be provided in W or kW.\nPositive value: battery is discharging.\nNegative value: battery is charging.\n\n",
+          "akku_leistung": "Total battery power. Can be provided in W or kW.\nPositive value: battery is discharging.\nNegative value: battery is charging.",
+          "akku_leistung_invertiert": "Positive value: battery is discharging.\nNegative value: battery is charging.\n\n",
           "akku_laden": "Power at which the battery is being charged. Can be provided in W or kW.\nThe value must always be positive.",
           "akku_entladen": "Power at which the battery is being discharged. Can be provided in W or kW.\nThe value must always be positive.",
           "akku_prio": "The battery is supplied with PV power first, and the house is supplied afterwards.\n\nFor example, for batteries with a DC connection and a direct link to the PV modules.\nDefault behavior: PV power supplies the house first and charges the battery with surplus energy."

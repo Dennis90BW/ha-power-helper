@@ -37,12 +37,14 @@
         "description": "OPTIONAL\n\nIn diesem Schritt wird festgelegt, wie die Leistung am Akku ermittelt wird.\nEs kann entweder ein einzelner Sensor für die gesamte Akkuleistung ODER zwei getrennte Sensoren für Laden und Entladen verwendet werden.",
         "data": {
           "akku_leistung": "Akku Leistung",
+          "akku_leistung_invertiert": "Vorzeichen ändern",
           "akku_laden": "Akku laden",
           "akku_entladen": "Akku entladen",
           "akku_prio": "Akku hat Priorität und bekommt vorrangig PV Leistung. Erst danach wird das Haus versorgt."
         },
         "data_description": {
-          "akku_leistung": "Gesamtleistung des Akkus. Kann in W oder kW angegeben werden.\nPositiver Wert: Akku entlädt sich.\nNegativer Wert: Akku lädt auf.\n\n",
+          "akku_leistung": "Gesamtleistung des Akkus. Kann in W oder kW angegeben werden.\nPositiver Wert: Akku entlädt sich.\nNegativer Wert: Akku lädt auf.",
+          "akku_leistung_invertiert": "Positiver Wert: Akku lädt auf.\nNegativer Wert: Akku entlädt sich.\n\n",
           "akku_laden": "Leistung, mit der der Akku geladen wird. Kann in W oder kW angegeben werden.\nDer Wert muss immer positiv sein.",
           "akku_entladen": "Leistung, mit der der Akku entladen wird. Kann in W oder kW angegeben werden.\nDer Wert muss immer positiv sein.",
           "akku_prio": "Bspw. für Akkus mit DC-Anschluss und direkter Verbindung zu den PV-Modulen.\nStandard ist: PV Leistung versorgt zuerst das Haus und bei Überschuss den Akku."

@@ -17,6 +17,7 @@ This is my first GitHub project, and the custom integration was created with the
 
 - 🧩 Automatically creates missing **combined or separate power sensors** for **grid** and **battery**
 - 🔌 Power flow breakdown (PV, grid, battery, home)
+- 🔋 Battery power can be inverted
 - ⚙️ Easy setup via the UI
 - 📊 Output in **watts (W)**
 - 🔄 Supports sensors in **W** and **kW**
@@ -67,22 +68,28 @@ This is my first GitHub project, and the custom integration was created with the
 ## 🧠 Created Sensors
 
 ### 🔌 Grid
+#### Input
 - `sensor.netz_leistung` — Grid power
 - `sensor.netz_bezug` — Grid consumption
 - `sensor.netz_einspeisung` — Grid feed-in
+#### Power flow
 - `sensor.netz_zu_haus` — Grid → Home
 - `sensor.netz_zu_akku` — Grid → Battery
 
 ### ☀️ PV
+#### Input
 - `sensor.pv_leistung` — PV power
+#### Power flow
 - `sensor.pv_zu_haus` — PV → Home
 - `sensor.pv_zu_akku` — PV → Battery
 - `sensor.pv_zu_netz` — PV → Grid
 
 ### 🔋 Battery
+#### Input
 - `sensor.akku_leistung` — Battery power
 - `sensor.akku_laden` — Battery charging
 - `sensor.akku_entladen` — Battery discharging
+#### Power flow
 - `sensor.akku_zu_haus` — Battery → Home
 - `sensor.akku_zu_netz` — Battery → Grid
 
@@ -95,7 +102,7 @@ All sensors provide **watts (W)** and are fully dashboard-ready.
 
 ## 🧪 Status
 
-Version: **1.0.0**  
+Version: **1.0.1**  
 
 Tested with PV + battery systems
 
