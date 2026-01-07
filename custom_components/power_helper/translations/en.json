@@ -44,7 +44,7 @@
         },
         "data_description": {
           "akku_leistung": "Total battery power. Can be provided in W or kW.\nPositive value: battery is discharging.\nNegative value: battery is charging.",
-          "akku_leistung_invertiert": "Positive value: battery is discharging.\nNegative value: battery is charging.",
+          "akku_leistung_invertiert": "Positive value: battery is charging.\nNegative value: battery is discharging.",
           "akku_laden": "Power at which the battery is being charged. Can be provided in W or kW.\nThe value must always be positive.",
           "akku_entladen": "Power at which the battery is being discharged. Can be provided in W or kW.\nThe value must always be positive.",
           "akku_prio": "The battery is supplied with PV power first, and the house is supplied afterwards.\n\nFor example, for batteries with a DC connection and a direct link to the PV modules.\nDefault behavior: PV power supplies the house first and charges the battery with surplus energy."

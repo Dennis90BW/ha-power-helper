@@ -176,7 +176,7 @@ class BasePhSensor(SensorEntity):
             name=entry.title,
             manufacturer="Dennis90BW",
             model="powerHELPER",
-            sw_version="1.0.1",
+            sw_version="1.0.2",
         )
 
 

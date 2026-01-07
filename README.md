@@ -102,7 +102,7 @@ All sensors provide **watts (W)** and are fully dashboard-ready.
 
 ## 🧪 Status
 
-Version: **1.0.1**  
+Version: **1.0.2**  
 
 Tested with PV + battery systems
 

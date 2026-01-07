@@ -104,7 +104,7 @@ Alle Sensoren liefern **Watt (W)** und sind Dashboard-fähig.
 
 ## 🧪 Status
 
-Version: **1.0.1**
+Version: **1.0.2**
 
 Getestet mit PV + Akku Systemen
 
