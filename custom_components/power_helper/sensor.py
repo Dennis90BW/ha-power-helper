@@ -19,7 +19,7 @@ from .const import DOMAIN
 
 def power_in_watt(hass: HomeAssistant, entry: ConfigEntry, entity_id: str) -> float:
     """Return power in Watt, normalized from W / kW."""
-    data = entry.data
+    data = entry.options or entry.data
     try:
         state = hass.states.get(entity_id)
         if state is None or state.state in (None, "unknown", "unavailable"):
@@ -41,6 +41,37 @@ def power_in_watt(hass: HomeAssistant, entry: ConfigEntry, entity_id: str) -> fl
     except Exception:
         return 0.0
 
+def sum_pv_power(hass: HomeAssistant, entry: ConfigEntry) -> float:
+    """Return the sum of all PV sensors in Watt."""
+    data = entry.options or entry.data
+    pv_sensors = data.get("pv_leistung")
+
+    if not pv_sensors:
+        return 0.0
+
+    # Falls nur ein einzelner Sensor angegeben wurde, in eine Liste packen
+    if isinstance(pv_sensors, str):
+        pv_sensors = [pv_sensors]
+
+    total = 0.0
+    for sensor_id in pv_sensors:
+        try:
+            state = hass.states.get(sensor_id)
+            if state is None or state.state in (None, "unknown", "unavailable"):
+                continue
+
+            value = float(state.state)
+            unit = state.attributes.get("unit_of_measurement")
+
+            if unit in (UnitOfPower.KILO_WATT, "kW"):
+                value *= 1000
+
+            total += value
+        except Exception:
+            continue
+
+    return total
+
 
 # =====================================================================
 # SETUP
@@ -48,7 +79,7 @@ def power_in_watt(hass: HomeAssistant, entry: ConfigEntry, entity_id: str) -> fl
 
 async def async_setup_entry(hass: HomeAssistant, entry: ConfigEntry, async_add_entities):
     sensors: list[SensorEntity] = []
-    data = entry.data
+    data = entry.options or entry.data
 
     # ==================== GRID ====================
 
@@ -129,7 +160,6 @@ async def async_setup_entry(hass: HomeAssistant, entry: ConfigEntry, async_add_e
     flows = {
         "netz": data.get("netz_leistung"),
         "akku": data.get("akku_leistung"),
-        "pv": data.get("pv_leistung"),
         "netz_bezug": data.get("netz_bezug"),
         "netz_einspeisung": data.get("netz_einspeisung"),
         "akku_laden": data.get("akku_laden"),
@@ -139,7 +169,7 @@ async def async_setup_entry(hass: HomeAssistant, entry: ConfigEntry, async_add_e
     sensors.append(FlowPowerSensor(hass, entry, "haus", "Haus Leistung", flows))
 
     if data.get("pv_leistung"):
-        sensors.append(ProxyPowerSensor(hass, source_entity=data["pv_leistung"], entry=entry, key="pv_leistung", name="PV Leistung"))
+        sensors.append(ProxyPvSumPowerSensor(hass, entry=entry, key="pv_leistung", name="PV Leistung"))
         sensors.append(FlowPowerSensor(hass, entry, "pv_zu_haus", "PV zu Haus", flows))
         sensors.append(FlowPowerSensor(hass, entry, "pv_zu_netz", "PV zu Netz", flows))
 
@@ -176,7 +206,7 @@ class BasePhSensor(SensorEntity):
             name=entry.title,
             manufacturer="Dennis90BW",
             model="powerHELPER",
-            sw_version="1.0.2",
+            sw_version="1.0.5",
         )
 
 
@@ -204,6 +234,24 @@ class ProxyPowerSensor(BasePhSensor):
         self._attr_native_value = power_in_watt(self.hass, self._entry, self._source)
         self.async_write_ha_state()
 
+class ProxyPvSumPowerSensor(BasePhSensor):
+    def __init__(self, hass, *, entry, key, name):
+        super().__init__(entry=entry, key=key, name=name)
+        self.hass = hass
+
+    async def async_added_to_hass(self):
+        data = self._entry.options or self._entry.data
+        pv_sensors = data.get("pv_leistung") or []
+        if isinstance(pv_sensors, str):
+            pv_sensors = [pv_sensors]
+
+        async_track_state_change_event(self.hass, pv_sensors, self._update)
+        self._update()
+
+    @callback
+    def _update(self, event=None):
+        self._attr_native_value = sum_pv_power(self.hass, self._entry)
+        self.async_write_ha_state()
 
 # =====================================================================
 # SPLIT / COMBINE
@@ -275,9 +323,10 @@ class FlowPowerSensor(BasePhSensor):
     def _update(self, event=None):
         def val(e):
             return power_in_watt(self.hass, self._entry, e) if e else 0.0
-
+        cfg = self._entry.options or self._entry.data
+        akku_prio = cfg.get("akku_prio", False)
         netz = val(self._sources["netz"])
-        pv = val(self._sources["pv"])
+        pv = sum_pv_power(self.hass, self._entry)
         akku = val(self._sources["akku"])
         nb = val(self._sources["netz_bezug"])
         ne = val(self._sources["netz_einspeisung"])
@@ -299,7 +348,6 @@ class FlowPowerSensor(BasePhSensor):
             akku = ae - al
 
         haus = netz + pv + akku
-        akku_prio = self._entry.data.get("akku_prio", False)
 
         if akku_prio:
             pv_zu_akku = max(min(pv, al),0)
