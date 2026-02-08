@@ -238,6 +238,8 @@ class ProxyPvSumPowerSensor(BasePhSensor):
     def __init__(self, hass, *, entry, key, name):
         super().__init__(entry=entry, key=key, name=name)
         self.hass = hass
+        self._attr_entity_registry_enabled_default = False
+        self._attr_entity_category = EntityCategory.DIAGNOSTIC
 
     async def async_added_to_hass(self):
         data = self._entry.options or self._entry.data

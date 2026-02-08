@@ -18,7 +18,8 @@ Dies ist mein erstes GitHub-Projekt und die Custom Integration wurde mithilfe vo
 - 🧩 Erstellt automatisch fehlende **kombinierte oder getrennte Leistungssensoren** für **Netz-** und **Akkuleistung**
 - 🔌 Aufteilung von Leistungsflüssen (PV, Netz, Akku, Haus)
 - 🔋 Akku-Leistung kann invertiert werden
-- ⚙️ Einfache Einrichtung über die UI
+- ➕ Mehrere PV-Anlagen können hinzugefügt werden
+- ⚙️ Einfache Einrichtung und Bearbeitung über die UI
 - 📊 Ausgabe in **Watt (W)**
 - 🔄 Unterstützt Sensoren in **W** und **kW**
 - 🌍 Mehrsprachig (DE / EN)
@@ -39,11 +40,10 @@ Dies ist mein erstes GitHub-Projekt und die Custom Integration wurde mithilfe vo
 
 ### 🔹 HACS (empfohlen)
 
-1. Öffne **HACS → Integrationen**
-2. Klicke auf **⋮ → Benutzerdefinierte Repositories**
-3. Repository hinzufügen: `https://github.com/Dennis90BW/ha-power-helper` → Kategorie: **Integration**
-4. powerHELPER installieren
-5. Home Assistant neu starten
+1. Öffne **HACS**
+2. Suche nach **powerHELPER**
+3. auf **Herunterladen** klicken
+4. Home Assistant neu starten
 
 ---
 
@@ -102,9 +102,19 @@ Alle Sensoren liefern **Watt (W)** und sind Dashboard-fähig.
 
 ---
 
+## ❓ FAQ
+
+### Benötige ich AC oder DC Sensoren?
+
+Im Allgemeinen sollten alle Sensoren für diese Bilanz AC-Leistungen sein, da diese die tatsächlichen Leistungsflüsse im Stromkreis darstellen.
+
+DC-Sensoren, wie sie beispielsweise von Wechselrichtern direkt aus der PV-Anlage oder bestimmten Akkuspeichern kommen, können ebenfalls genutzt werden. In diesem Fall spiegeln sich die DC/AC-Wandlungsverluste einfach in der **Haus Leistung** wider, wodurch der Gesamtverbrauch des Hauses entsprechend steigt, ähnlich wie bei anderen elektrischen Verbrauchern.
+
+---
+
 ## 🧪 Status
 
-Version: **1.0.2**
+Version: **1.0.5**
 
 Getestet mit PV + Akku Systemen
 

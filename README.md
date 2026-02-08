@@ -17,8 +17,9 @@ This is my first GitHub project, and the custom integration was created with the
 
 - 🧩 Automatically creates missing **combined or separate power sensors** for **grid** and **battery**
 - 🔌 Power flow breakdown (PV, grid, battery, home)
+- ➕ Multiple PV systems can be added
 - 🔋 Battery power can be inverted
-- ⚙️ Easy setup via the UI
+- ⚙️ Easy setup and editing via the UI
 - 📊 Output in **watts (W)**
 - 🔄 Supports sensors in **W** and **kW**
 - 🌍 Multilingual (**DE / EN**)
@@ -39,11 +40,10 @@ This is my first GitHub project, and the custom integration was created with the
 
 ### 🔹 HACS (recommended)
 
-1. Open **HACS → Integrations**
-2. Click **⋮ → Custom repositories**
-3. Add repository: `https://github.com/Dennis90BW/ha-power-helper` → Category: **Integration**
-4. Install **powerHELPER**
-5. Restart Home Assistant
+1. Open **HACS**
+2. Search for **powerHELPER**
+3. Click **Download**
+4. Restart Home Assistant
 
 ---
 
@@ -100,9 +100,19 @@ All sensors provide **watts (W)** and are fully dashboard-ready.
 
 ---
 
+## ❓ FAQ
+
+### Do I need AC or DC sensors?
+
+In general, all sensors for this balance should be AC power sensors, as they represent the actual power flows in the electrical circuit.
+
+DC sensors, such as those coming directly from inverters in the PV system or certain battery storage systems, can also be used. In this case, the DC/AC conversion losses are simply reflected in the **Home Power**, causing the overall consumption of the home to increase, similar to other electrical consumers.
+
+---
+
 ## 🧪 Status
 
-Version: **1.0.2**  
+Version: **1.0.5**  
 
 Tested with PV + battery systems
 
