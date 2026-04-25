@@ -4,7 +4,7 @@
 
 **powerHELPER** ist eine Custom Integration für **Home Assistant**, mit der elektrische Leistungsflüsse zwischen **PV-Anlage, Netz, Akku und Haus** automatisch aufgeschlüsselt werden.
 
-Ideal für Nutzer von [Solar Forecast ML](https://github.com/Zara-Toorox/ha-solar-forecast-ml) und [SFML-Stats](https://github.com/Zara-Toorox/sfml-stats). Danke @Zara-Toorox für diese tollen Integrationen!
+Ideal für Nutzer von [Solar Forecast ML](https://github.com/Zara-Toorox/ha-solar-forecast-ml) und SFML-Stats. Danke @Zara-Toorox für diese tollen Integrationen!
 
 ---
 
@@ -78,7 +78,6 @@ Dies ist mein erstes GitHub-Projekt und die Custom Integration wurde mithilfe vo
 - `sensor.netz_zu_akku` — Netz → Akku
 
 ### ☀️ PV
-
 #### Input
 - `sensor.pv_leistung` — PV Leistung
 #### Leistungsfluss
@@ -89,6 +88,7 @@ Dies ist mein erstes GitHub-Projekt und die Custom Integration wurde mithilfe vo
 ### 🔋 Akku
 #### Input
 - `sensor.akku_leistung` — Akku Leistung
+- `sensor.akku_leistung_inv` — Akku Leistung invertiert
 - `sensor.akku_laden` — Akku laden
 - `sensor.akku_entladen` — Akku entladen
 #### Leistungsfluss
@@ -114,7 +114,7 @@ DC-Sensoren, wie sie beispielsweise von Wechselrichtern direkt aus der PV-Anlage
 
 ## 🧪 Status
 
-Version: **1.0.5**
+Version: **1.0.6**
 
 Getestet mit PV + Akku Systemen
 

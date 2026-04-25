@@ -4,7 +4,7 @@
 
 **powerHELPER** is a custom integration for **Home Assistant** that automatically breaks down electrical power flows between the **PV system, grid, battery, and home**.
 
-Ideal for users of [Solar Forecast ML](https://github.com/Zara-Toorox/ha-solar-forecast-ml) and [SFML-Stats](https://github.com/Zara-Toorox/sfml-stats). Thanks @Zara-Toorox for these awesome integrations!
+Ideal for users of [Solar Forecast ML](https://github.com/Zara-Toorox/ha-solar-forecast-ml) and SFML-Stats. Thanks @Zara-Toorox for these awesome integrations!
 
 ---
 
@@ -30,7 +30,7 @@ This is my first GitHub project, and the custom integration was created with the
 
 - Home Assistant **2025.12.x or newer**
 - Existing power sensors with `device_class: power`:
-  - Required: grid power **or** grid import & export
+  - Required: grid power **or** grid consumption & feed-in
   - Optional: PV power
   - Optional: battery power **or** battery charge & discharge
 
@@ -87,6 +87,7 @@ This is my first GitHub project, and the custom integration was created with the
 ### 🔋 Battery
 #### Input
 - `sensor.akku_leistung` — Battery power
+- `sensor.akku_leistung_inv` — Battery power inverted
 - `sensor.akku_laden` — Battery charging
 - `sensor.akku_entladen` — Battery discharging
 #### Power flow
@@ -112,7 +113,7 @@ DC sensors, such as those coming directly from inverters in the PV system or cer
 
 ## 🧪 Status
 
-Version: **1.0.5**  
+Version: **1.0.6**  
 
 Tested with PV + battery systems
 

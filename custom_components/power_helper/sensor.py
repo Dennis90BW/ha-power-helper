@@ -123,6 +123,7 @@ async def async_setup_entry(hass: HomeAssistant, entry: ConfigEntry, async_add_e
     if data.get("akku_leistung") and not (data.get("akku_laden") and data.get("akku_entladen")):
         sensors += [
             ProxyPowerSensor(hass, source_entity=data["akku_leistung"], entry=entry, key="akku_leistung", name="Akku Leistung"),
+            InvertedPowerSensor(hass, source_entity=data["akku_leistung"], entry=entry, key="akku_leistung_inv", name="Akku Leistung invertiert"),
             SplitPowerSensor(
                 hass,
                 source_entity=data["akku_leistung"],
@@ -151,7 +152,17 @@ async def async_setup_entry(hass: HomeAssistant, entry: ConfigEntry, async_add_e
                 neg_entity=data["akku_laden"],
                 entry=entry,
                 key="akku_leistung",
-                name="Akkuleistung",
+                name="Akku Leistung",
+                ena_def=True
+            ),
+            CombinedPowerSensor(
+                hass,
+                pos_entity=data["akku_laden"],
+                neg_entity=data["akku_entladen"],
+                entry=entry,
+                key="akku_leistung_inv",
+                name="Akku Leistung invertiert",
+                ena_def=False
             ),
         ]
 
@@ -206,7 +217,7 @@ class BasePhSensor(SensorEntity):
             name=entry.title,
             manufacturer="Dennis90BW",
             model="powerHELPER",
-            sw_version="1.0.5",
+            sw_version="1.0.6",
         )
 
 
@@ -255,6 +266,26 @@ class ProxyPvSumPowerSensor(BasePhSensor):
         self._attr_native_value = sum_pv_power(self.hass, self._entry)
         self.async_write_ha_state()
 
+class InvertedPowerSensor(BasePhSensor):
+    def __init__(self, hass, *, source_entity, entry, key, name):
+        super().__init__(entry=entry, key=key, name=name)
+        self.hass = hass
+        self._source = source_entity
+        self._attr_entity_registry_enabled_default = False
+
+    async def async_added_to_hass(self):
+        async_track_state_change_event(self.hass, [self._source], self._changed)
+        self._update()
+
+    @callback
+    def _changed(self, event):
+        self._update()
+
+    def _update(self):
+        value = power_in_watt(self.hass, self._entry, self._source)
+        self._attr_native_value = -value
+        self.async_write_ha_state()
+
 # =====================================================================
 # SPLIT / COMBINE
 # =====================================================================
@@ -281,11 +312,12 @@ class SplitPowerSensor(BasePhSensor):
 
 
 class CombinedPowerSensor(BasePhSensor):
-    def __init__(self, hass, *, pos_entity, neg_entity, entry, key, name):
+    def __init__(self, hass, *, pos_entity, neg_entity, entry, key, name, ena_def):
         super().__init__(entry=entry, key=key, name=name)
         self.hass = hass
         self._pos = pos_entity
         self._neg = neg_entity
+        self._attr_entity_registry_enabled_default = ena_def
 
     async def async_added_to_hass(self):
         async_track_state_change_event(self.hass, [self._pos, self._neg], self._changed)
