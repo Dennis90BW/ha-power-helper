@@ -70,33 +70,33 @@ Dies ist mein erstes GitHub-Projekt und die Custom Integration wurde mithilfe vo
 ### 🔌 Netz
 
 #### Input
-- `sensor.netz_leistung` — Netz Leistung
-- `sensor.netz_bezug` — Netzbezug
-- `sensor.netz_einspeisung` — Netzeinspeisung
+- `sensor.gerät_netz_leistung` — Netz Leistung
+- `sensor.gerät_netzbezug` — Netzbezug
+- `sensor.gerät_netzeinspeisung` — Netzeinspeisung
 #### Leistungsfluss
-- `sensor.netz_zu_haus` — Netz → Haus
-- `sensor.netz_zu_akku` — Netz → Akku
+- `sensor.gerät_netz_zu_haus` — Netz → Haus
+- `sensor.gerät_netz_zu_akku` — Netz → Akku
 
 ### ☀️ PV
 #### Input
-- `sensor.pv_leistung` — PV Leistung
+- `sensor.gerät_pv_leistung` — PV Leistung
 #### Leistungsfluss
-- `sensor.pv_zu_haus` — PV → Haus
-- `sensor.pv_zu_akku` — PV → Akku
-- `sensor.pv_zu_netz` — PV → Netz
+- `sensor.gerät_pv_zu_haus` — PV → Haus
+- `sensor.gerät_pv_zu_akku` — PV → Akku
+- `sensor.gerät_pv_zu_netz` — PV → Netz
 
 ### 🔋 Akku
 #### Input
-- `sensor.akku_leistung` — Akku Leistung
-- `sensor.akku_leistung_inv` — Akku Leistung invertiert
-- `sensor.akku_laden` — Akku laden
-- `sensor.akku_entladen` — Akku entladen
+- `sensor.gerät_akku_leistung` — Akku Leistung
+- `sensor.gerät_akku_leistung_invertiert` — Akku Leistung invertiert
+- `sensor.gerät_akku_laden` — Akku laden
+- `sensor.gerät_akku_entladen` — Akku entladen
 #### Leistungsfluss
-- `sensor.akku_zu_haus` — Akku → Haus
-- `sensor.akku_zu_netz` — Akku → Netz
+- `sensor.gerät_akku_zu_haus` — Akku → Haus
+- `sensor.gerät_akku_zu_netz` — Akku → Netz
 
 ### 🏠 Haus
-- `sensor.haus_leistung` — Haus Leistung
+- `sensor.gerät_haus_leistung` — Haus Leistung
 
 Alle Sensoren liefern **Watt (W)** und sind Dashboard-fähig.
 

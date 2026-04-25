@@ -69,33 +69,33 @@ This is my first GitHub project, and the custom integration was created with the
 
 ### 🔌 Grid
 #### Input
-- `sensor.netz_leistung` — Grid power
-- `sensor.netz_bezug` — Grid consumption
-- `sensor.netz_einspeisung` — Grid feed-in
+- `sensor.device_grid_power` — Grid power
+- `sensor.device_grid_consumption` — Grid consumption
+- `sensor.device_grid_feed_in` — Grid feed-in
 #### Power flow
-- `sensor.netz_zu_haus` — Grid → Home
-- `sensor.netz_zu_akku` — Grid → Battery
+- `sensor.device_grid_to_home` — Grid → Home
+- `sensor.device_grid_to_battery` — Grid → Battery
 
 ### ☀️ PV
 #### Input
-- `sensor.pv_leistung` — PV power
+- `sensor.device_pv_power` — PV power
 #### Power flow
-- `sensor.pv_zu_haus` — PV → Home
-- `sensor.pv_zu_akku` — PV → Battery
-- `sensor.pv_zu_netz` — PV → Grid
+- `sensor.device_pv_to_home` — PV → Home
+- `sensor.device_pv_to_battery` — PV → Battery
+- `sensor.device_pv_to_grid` — PV → Grid
 
 ### 🔋 Battery
 #### Input
-- `sensor.akku_leistung` — Battery power
-- `sensor.akku_leistung_inv` — Battery power inverted
-- `sensor.akku_laden` — Battery charging
-- `sensor.akku_entladen` — Battery discharging
+- `sensor.device_battery_power` — Battery power
+- `sensor.device_battery_power_inverted` — Battery power inverted
+- `sensor.device_battery_charging` — Battery charging
+- `sensor.device_battery_discharging` — Battery discharging
 #### Power flow
-- `sensor.akku_zu_haus` — Battery → Home
-- `sensor.akku_zu_netz` — Battery → Grid
+- `sensor.device_battery_to_home` — Battery → Home
+- `sensor.device_battery_to_grid` — Battery → Grid
 
 ### 🏠 Home
-- `sensor.haus_leistung` — Home power
+- `sensor.device_home_power` — Home power
 
 All sensors provide **watts (W)** and are fully dashboard-ready.
 
