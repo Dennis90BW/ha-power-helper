@@ -115,5 +115,31 @@
       "choose_either_total_or_split": "Bitte entweder einen Gesamtsensor ODER zwei getrennte Sensoren auswählen, nicht beides.",
       "missing_required_sensors": "Bitte eine gültige Kombination von Sensoren auswählen."
     }
+  },
+
+  "entity": {
+    "sensor": {
+      "netz_leistung": { "name": "Netz Leistung" },
+      "netz_bezug": { "name": "Netzbezug" },
+      "netz_einspeisung": { "name": "Netzeinspeisung" },
+
+      "akku_leistung": { "name": "Akku Leistung" },
+      "akku_leistung_inv": { "name": "Akku Leistung (invertiert)" },
+      "akku_entladen": { "name": "Akku entladen" },
+      "akku_laden": { "name": "Akku laden" },
+
+      "haus": { "name": "Haus Leistung" },
+
+      "pv_leistung": { "name": "PV Leistung" },
+      "pv_zu_haus": { "name": "PV zu Haus" },
+      "pv_zu_netz": { "name": "PV zu Netz" },
+      "pv_zu_akku": { "name": "PV zu Akku" },
+
+      "netz_zu_haus": { "name": "Netz zu Haus" },
+      "netz_zu_akku": { "name": "Netz zu Akku" },
+
+      "akku_zu_haus": { "name": "Akku zu Haus" },
+      "akku_zu_netz": { "name": "Akku zu Netz" }
+    }
   }
 }

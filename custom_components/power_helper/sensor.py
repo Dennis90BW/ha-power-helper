@@ -85,13 +85,12 @@ async def async_setup_entry(hass: HomeAssistant, entry: ConfigEntry, async_add_e
 
     if data.get("netz_leistung") and not (data.get("netz_bezug") and data.get("netz_einspeisung")):
         sensors += [
-            ProxyPowerSensor(hass, source_entity=data["netz_leistung"], entry=entry, key="netz_leistung", name="Netz Leistung"),
+            ProxyPowerSensor(hass, source_entity=data["netz_leistung"], entry=entry, key="netz_leistung"),
             SplitPowerSensor(
                 hass,
                 source_entity=data["netz_leistung"],
                 entry=entry,
                 key="netz_bezug",
-                name="Netzbezug",
                 positive=True,
             ),
             SplitPowerSensor(
@@ -99,22 +98,20 @@ async def async_setup_entry(hass: HomeAssistant, entry: ConfigEntry, async_add_e
                 source_entity=data["netz_leistung"],
                 entry=entry,
                 key="netz_einspeisung",
-                name="Netzeinspeisung",
                 positive=False,
             ),
         ]
 
     if not data.get("netz_leistung") and (data.get("netz_bezug") and data.get("netz_einspeisung")):
         sensors += [
-            ProxyPowerSensor(hass, source_entity=data["netz_bezug"], entry=entry, key="netz_bezug", name="Netz Bezug"),
-            ProxyPowerSensor(hass, source_entity=data["netz_einspeisung"], entry=entry, key="netz_einspeisung", name="Netz Einspeisung"),
+            ProxyPowerSensor(hass, source_entity=data["netz_bezug"], entry=entry, key="netz_bezug"),
+            ProxyPowerSensor(hass, source_entity=data["netz_einspeisung"], entry=entry, key="netz_einspeisung"),
             CombinedPowerSensor(
                 hass,
                 pos_entity=data["netz_bezug"],
                 neg_entity=data["netz_einspeisung"],
                 entry=entry,
                 key="netz_leistung",
-                name="Netzleistung",
             ),
         ]
 
@@ -122,14 +119,13 @@ async def async_setup_entry(hass: HomeAssistant, entry: ConfigEntry, async_add_e
 
     if data.get("akku_leistung") and not (data.get("akku_laden") and data.get("akku_entladen")):
         sensors += [
-            ProxyPowerSensor(hass, source_entity=data["akku_leistung"], entry=entry, key="akku_leistung", name="Akku Leistung"),
-            InvertedPowerSensor(hass, source_entity=data["akku_leistung"], entry=entry, key="akku_leistung_inv", name="Akku Leistung invertiert"),
+            ProxyPowerSensor(hass, source_entity=data["akku_leistung"], entry=entry, key="akku_leistung"),
+            InvertedPowerSensor(hass, source_entity=data["akku_leistung"], entry=entry, key="akku_leistung_inv"),
             SplitPowerSensor(
                 hass,
                 source_entity=data["akku_leistung"],
                 entry=entry,
                 key="akku_entladen",
-                name="Akku entladen",
                 positive=True,
             ),
             SplitPowerSensor(
@@ -137,22 +133,20 @@ async def async_setup_entry(hass: HomeAssistant, entry: ConfigEntry, async_add_e
                 source_entity=data["akku_leistung"],
                 entry=entry,
                 key="akku_laden",
-                name="Akku laden",
                 positive=False,
             ),
         ]
 
     if not data.get("akku_leistung") and (data.get("akku_laden") and data.get("akku_entladen")):
         sensors += [
-            ProxyPowerSensor(hass, source_entity=data["akku_laden"], entry=entry, key="akku_laden", name="Akku Laden"),
-            ProxyPowerSensor(hass, source_entity=data["akku_entladen"], entry=entry, key="akku_entladen", name="Akku Entladen"),
+            ProxyPowerSensor(hass, source_entity=data["akku_laden"], entry=entry, key="akku_laden"),
+            ProxyPowerSensor(hass, source_entity=data["akku_entladen"], entry=entry, key="akku_entladen"),
             CombinedPowerSensor(
                 hass,
                 pos_entity=data["akku_entladen"],
                 neg_entity=data["akku_laden"],
                 entry=entry,
                 key="akku_leistung",
-                name="Akku Leistung",
                 ena_def=True
             ),
             CombinedPowerSensor(
@@ -161,7 +155,6 @@ async def async_setup_entry(hass: HomeAssistant, entry: ConfigEntry, async_add_e
                 neg_entity=data["akku_entladen"],
                 entry=entry,
                 key="akku_leistung_inv",
-                name="Akku Leistung invertiert",
                 ena_def=False
             ),
         ]
@@ -177,22 +170,22 @@ async def async_setup_entry(hass: HomeAssistant, entry: ConfigEntry, async_add_e
         "akku_entladen": data.get("akku_entladen"),
     }
 
-    sensors.append(FlowPowerSensor(hass, entry, "haus", "Haus Leistung", flows))
+    sensors.append(FlowPowerSensor(hass, entry, "haus", flows))
 
     if data.get("pv_leistung"):
-        sensors.append(ProxyPvSumPowerSensor(hass, entry=entry, key="pv_leistung", name="PV Leistung"))
-        sensors.append(FlowPowerSensor(hass, entry, "pv_zu_haus", "PV zu Haus", flows))
-        sensors.append(FlowPowerSensor(hass, entry, "pv_zu_netz", "PV zu Netz", flows))
+        sensors.append(ProxyPvSumPowerSensor(hass, entry=entry, key="pv_leistung"))
+        sensors.append(FlowPowerSensor(hass, entry, "pv_zu_haus", flows))
+        sensors.append(FlowPowerSensor(hass, entry, "pv_zu_netz", flows))
 
         if data.get("akku_leistung") or (data.get("akku_laden") and data.get("akku_entladen")):
-            sensors.append(FlowPowerSensor(hass, entry, "pv_zu_akku", "PV zu Akku", flows))
+            sensors.append(FlowPowerSensor(hass, entry, "pv_zu_akku", flows))
 
-    sensors.append(FlowPowerSensor(hass, entry, "netz_zu_haus", "Netz zu Haus", flows))
+    sensors.append(FlowPowerSensor(hass, entry, "netz_zu_haus", flows))
 
     if data.get("akku_leistung") or (data.get("akku_laden") and data.get("akku_entladen")):
-        sensors.append(FlowPowerSensor(hass, entry, "netz_zu_akku", "Netz zu Akku", flows))
-        sensors.append(FlowPowerSensor(hass, entry, "akku_zu_haus", "Akku zu Haus", flows))
-        sensors.append(FlowPowerSensor(hass, entry, "akku_zu_netz", "Akku zu Netz", flows))
+        sensors.append(FlowPowerSensor(hass, entry, "netz_zu_akku", flows))
+        sensors.append(FlowPowerSensor(hass, entry, "akku_zu_haus", flows))
+        sensors.append(FlowPowerSensor(hass, entry, "akku_zu_netz", flows))
 
     async_add_entities(sensors)
 
@@ -207,10 +200,11 @@ class BasePhSensor(SensorEntity):
     _attr_state_class = SensorStateClass.MEASUREMENT
     _attr_native_unit_of_measurement = UnitOfPower.WATT
     _attr_icon = "mdi:lightning-bolt-circle"
+    _attr_has_entity_name = True
 
-    def __init__(self, *, entry: ConfigEntry, key: str, name: str):
+    def __init__(self, *, entry: ConfigEntry, key: str):
         self._entry = entry
-        self._attr_name = name
+        self._attr_translation_key = key
         self._attr_unique_id = f"{DOMAIN}_{entry.entry_id}_{key}"
         self._attr_device_info = DeviceInfo(
             identifiers={(DOMAIN, entry.entry_id)},
@@ -226,8 +220,8 @@ class BasePhSensor(SensorEntity):
 # =====================================================================
 
 class ProxyPowerSensor(BasePhSensor):
-    def __init__(self, hass, *, source_entity, entry, key, name):
-        super().__init__(entry=entry, key=key, name=name)
+    def __init__(self, hass, *, source_entity, entry, key):
+        super().__init__(entry=entry, key=key)
         self.hass = hass
         self._source = source_entity
         self._attr_entity_registry_enabled_default = False
@@ -246,8 +240,8 @@ class ProxyPowerSensor(BasePhSensor):
         self.async_write_ha_state()
 
 class ProxyPvSumPowerSensor(BasePhSensor):
-    def __init__(self, hass, *, entry, key, name):
-        super().__init__(entry=entry, key=key, name=name)
+    def __init__(self, hass, *, entry, key):
+        super().__init__(entry=entry, key=key)
         self.hass = hass
         self._attr_entity_registry_enabled_default = False
         self._attr_entity_category = EntityCategory.DIAGNOSTIC
@@ -267,8 +261,8 @@ class ProxyPvSumPowerSensor(BasePhSensor):
         self.async_write_ha_state()
 
 class InvertedPowerSensor(BasePhSensor):
-    def __init__(self, hass, *, source_entity, entry, key, name):
-        super().__init__(entry=entry, key=key, name=name)
+    def __init__(self, hass, *, source_entity, entry, key):
+        super().__init__(entry=entry, key=key)
         self.hass = hass
         self._source = source_entity
         self._attr_entity_registry_enabled_default = False
@@ -291,8 +285,8 @@ class InvertedPowerSensor(BasePhSensor):
 # =====================================================================
 
 class SplitPowerSensor(BasePhSensor):
-    def __init__(self, hass, *, source_entity, entry, key, name, positive):
-        super().__init__(entry=entry, key=key, name=name)
+    def __init__(self, hass, *, source_entity, entry, key, positive):
+        super().__init__(entry=entry, key=key)
         self.hass = hass
         self._source = source_entity
         self._positive = positive
@@ -312,8 +306,8 @@ class SplitPowerSensor(BasePhSensor):
 
 
 class CombinedPowerSensor(BasePhSensor):
-    def __init__(self, hass, *, pos_entity, neg_entity, entry, key, name, ena_def):
-        super().__init__(entry=entry, key=key, name=name)
+    def __init__(self, hass, *, pos_entity, neg_entity, entry, key, ena_def):
+        super().__init__(entry=entry, key=key)
         self.hass = hass
         self._pos = pos_entity
         self._neg = neg_entity
@@ -339,8 +333,8 @@ class CombinedPowerSensor(BasePhSensor):
 # =====================================================================
 
 class FlowPowerSensor(BasePhSensor):
-    def __init__(self, hass, entry, key, name, sources):
-        super().__init__(entry=entry, key=key, name=name)
+    def __init__(self, hass, entry, key, sources):
+        super().__init__(entry=entry, key=key)
         self.hass = hass
         self._key = key
         self._sources = sources

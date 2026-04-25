@@ -115,5 +115,31 @@
       "choose_either_total_or_split": "Please choose either a total sensor OR two separate sensors, not both.",
       "missing_required_sensors": "Please select a valid combination of sensors."
     }
+  },
+
+  "entity": {
+    "sensor": {
+      "netz_leistung": { "name": "Grid Power" },
+      "netz_bezug": { "name": "Grid Consumption" },
+      "netz_einspeisung": { "name": "Grid Feed-in" },
+
+      "akku_leistung": { "name": "Battery Power" },
+      "akku_leistung_inv": { "name": "Battery Power (Inverted)" },
+      "akku_entladen": { "name": "Battery Discharging" },
+      "akku_laden": { "name": "Battery Charging" },
+
+      "haus": { "name": "Home Power" },
+
+      "pv_leistung": { "name": "PV Power" },
+      "pv_zu_haus": { "name": "PV to Home" },
+      "pv_zu_netz": { "name": "PV to Grid" },
+      "pv_zu_akku": { "name": "PV to Battery" },
+
+      "netz_zu_haus": { "name": "Grid to Home" },
+      "netz_zu_akku": { "name": "Grid to Battery" },
+
+      "akku_zu_haus": { "name": "Battery to Home" },
+      "akku_zu_netz": { "name": "Battery to Grid" }
+    }
   }
 }

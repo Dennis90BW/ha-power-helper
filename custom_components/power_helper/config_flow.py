@@ -98,7 +98,7 @@ class PowerHelperConfigFlow(
             step_id="user",
             data_schema=vol.Schema(
                 {
-                    vol.Required(CONF_TITLE, default="Mein Stromkreis"): str,
+                    vol.Required(CONF_TITLE, default="powerHELPER"): str,
                 }
             ),
         )
