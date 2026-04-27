@@ -114,7 +114,7 @@ DC-Sensoren, wie sie beispielsweise von Wechselrichtern direkt aus der PV-Anlage
 
 ## 🧪 Status
 
-Version: **1.0.6**
+Version: **1.0.7**
 
 Getestet mit PV + Akku Systemen
 

@@ -112,6 +112,7 @@ async def async_setup_entry(hass: HomeAssistant, entry: ConfigEntry, async_add_e
                 neg_entity=data["netz_einspeisung"],
                 entry=entry,
                 key="netz_leistung",
+                ena_def=True,
             ),
         ]
 
@@ -211,7 +212,7 @@ class BasePhSensor(SensorEntity):
             name=entry.title,
             manufacturer="Dennis90BW",
             model="powerHELPER",
-            sw_version="1.0.6",
+            sw_version="1.0.7",
         )
 
 

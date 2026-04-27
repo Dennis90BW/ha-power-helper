@@ -113,7 +113,7 @@ DC sensors, such as those coming directly from inverters in the PV system or cer
 
 ## 🧪 Status
 
-Version: **1.0.6**  
+Version: **1.0.7**  
 
 Tested with PV + battery systems
 
