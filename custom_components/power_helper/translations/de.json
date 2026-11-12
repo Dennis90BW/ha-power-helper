@@ -23,19 +23,22 @@
         }
       },
       "pv": {
-        "title": "PV Leistung konfigurieren",
-        "description": "OPTIONAL\n\nIn diesem Schritt wird die PV Leistung am Wechselrichter festgelegt.\nHinweis: Wenn kein PV Sensor ausgewählt wird, werden spätere Berechnungen ohne PV Erzeugung durchgeführt und es werden weniger Sensoren erstellt.",
+        "title": "PV-Anlage konfigurieren",
+        "description": "OPTIONAL\n\nIn diesem Schritt kann die erste PV-Anlage angelegt werden. Weitere PV-Anlagen fügst du später auf der Integrationsseite über \"PV-Anlage hinzufügen\" hinzu.\nHinweis: Ohne PV-Anlage werden alle Berechnungen ohne PV Erzeugung durchgeführt und es werden weniger Sensoren erstellt.",
         "data": {
+          "pv_name": "Name der PV-Anlage",
           "pv_leistung": "PV Leistung"
         },
         "data_description": {
+          "pv_name": "Wird als eigenes Gerät angezeigt, z. B. \"PV Süddach\".",
           "pv_leistung": "Aktuelle Leistung der Photovoltaikanlage. Kann in W oder kW angegeben werden.\nDer Wert muss immer positiv sein."
         }
       },
       "battery": {
-        "title": "Akku Leistung konfigurieren",
-        "description": "OPTIONAL\n\nIn diesem Schritt wird festgelegt, wie die Leistung am Akku ermittelt wird.\nEs kann entweder ein einzelner Sensor für die gesamte Akkuleistung ODER zwei getrennte Sensoren für Laden und Entladen verwendet werden.",
+        "title": "Akku konfigurieren",
+        "description": "OPTIONAL\n\nIn diesem Schritt kann der erste Akku angelegt werden. Weitere Akkus fügst du später auf der Integrationsseite über \"Akku hinzufügen\" hinzu.\nEs kann entweder ein einzelner Sensor für die gesamte Akkuleistung ODER zwei getrennte Sensoren für Laden und Entladen verwendet werden.",
         "data": {
+          "akku_name": "Name des Akkus",
           "akku_leistung": "Akku Leistung",
           "akku_leistung_invertiert": "Vorzeichen ändern",
           "akku_laden": "Akku laden",
@@ -43,11 +46,12 @@
           "akku_prio": "Akku hat Priorität und bekommt vorrangig PV Leistung. Erst danach wird das Haus versorgt."
         },
         "data_description": {
+          "akku_name": "Wird als eigenes Gerät angezeigt, z. B. \"Akku Garage\".",
           "akku_leistung": "Gesamtleistung des Akkus. Kann in W oder kW angegeben werden.\nPositiver Wert: Akku entlädt sich.\nNegativer Wert: Akku lädt auf.",
           "akku_leistung_invertiert": "Positiver Wert: Akku lädt auf.\nNegativer Wert: Akku entlädt sich.",
           "akku_laden": "Leistung, mit der der Akku geladen wird. Kann in W oder kW angegeben werden.\nDer Wert muss immer positiv sein.",
           "akku_entladen": "Leistung, mit der der Akku entladen wird. Kann in W oder kW angegeben werden.\nDer Wert muss immer positiv sein.",
-          "akku_prio": "Bspw. für Akkus mit DC-Anschluss und direkter Verbindung zu den PV-Modulen.\nStandard ist: PV Leistung versorgt zuerst das Haus und bei Überschuss den Akku."
+          "akku_prio": "Bspw. für Akkus mit DC-Anschluss und direkter Verbindung zu den PV-Modulen. Die Einstellung gilt nur für diesen Akku.\nStandard ist: PV Leistung versorgt zuerst das Haus und bei Überschuss den Akku."
         }
       }
     },
@@ -56,18 +60,8 @@
       "missing_required_sensors": "Bitte eine gültige Kombination von Sensoren auswählen."
     }
   },
-
   "options": {
     "step": {
-      "select_step": {
-        "title": "Optionen",
-        "data": {
-          "step": "Wähle deine Konfiguration"
-        },
-        "data_description": {
-          "step": "Hinweis: Es können Entitäten nur ergänzt oder geändert werden, es können aber keine bereits hinzugefügten Entitäten entfernt werden. Wenn du eine Entität entfernen möchtest, musst du die Integration neu anlegen."
-        }
-      },
       "grid": {
         "title": "Netz Leistung konfigurieren",
         "description": "In diesem Schritt wird festgelegt, wie die Leistung am Stromzähler ermittelt wird.\nEs kann entweder ein einzelner Sensor für die gesamte Netzleistung ODER zwei getrennte Sensoren für Netzbezug und Netzeinspeisung verwendet werden.",
@@ -81,34 +75,6 @@
           "netz_bezug": "Leistung, die am Stromzähler bezogen wird. Kann in W oder kW angegeben werden.\nDer Wert muss immer positiv sein.",
           "netz_einspeisung": "Leistung, die am Stromzähler eingespeist wird. Kann in W oder kW angegeben werden.\nDer Wert muss immer positiv sein."
         }
-      },
-      "pv": {
-        "title": "PV Leistung konfigurieren",
-        "description": "OPTIONAL\n\nIn diesem Schritt wird die PV Leistung am Wechselrichter festgelegt.\nHinweis: Wenn kein PV Sensor ausgewählt wird, werden spätere Berechnungen ohne PV Erzeugung durchgeführt und es werden weniger Sensoren erstellt.",
-        "data": {
-          "pv_leistung": "PV Leistung"
-        },
-        "data_description": {
-          "pv_leistung": "Aktuelle Leistung der Photovoltaikanlage. Kann in W oder kW angegeben werden.\nDer Wert muss immer positiv sein."
-        }
-      },
-      "battery": {
-        "title": "Akku Leistung konfigurieren",
-        "description": "OPTIONAL\n\nIn diesem Schritt wird festgelegt, wie die Leistung am Akku ermittelt wird.\nEs kann entweder ein einzelner Sensor für die gesamte Akkuleistung ODER zwei getrennte Sensoren für Laden und Entladen verwendet werden.",
-        "data": {
-          "akku_leistung": "Akku Leistung",
-          "akku_leistung_invertiert": "Vorzeichen ändern",
-          "akku_laden": "Akku laden",
-          "akku_entladen": "Akku entladen",
-          "akku_prio": "Akku hat Priorität und bekommt vorrangig PV Leistung. Erst danach wird das Haus versorgt."
-        },
-        "data_description": {
-          "akku_leistung": "Gesamtleistung des Akkus. Kann in W oder kW angegeben werden.\nPositiver Wert: Akku entlädt sich.\nNegativer Wert: Akku lädt auf.",
-          "akku_leistung_invertiert": "Positiver Wert: Akku lädt auf.\nNegativer Wert: Akku entlädt sich.",
-          "akku_laden": "Leistung, mit der der Akku geladen wird. Kann in W oder kW angegeben werden.\nDer Wert muss immer positiv sein.",
-          "akku_entladen": "Leistung, mit der der Akku entladen wird. Kann in W oder kW angegeben werden.\nDer Wert muss immer positiv sein.",
-          "akku_prio": "Bspw. für Akkus mit DC-Anschluss und direkter Verbindung zu den PV-Modulen.\nStandard ist: PV Leistung versorgt zuerst das Haus und bei Überschuss den Akku."
-        }
       }
     },
     "error": {
@@ -116,30 +82,167 @@
       "missing_required_sensors": "Bitte eine gültige Kombination von Sensoren auswählen."
     }
   },
-
+  "config_subentries": {
+    "pv": {
+      "entry_type": "PV-Anlage",
+      "initiate_flow": {
+        "user": "PV-Anlage hinzufügen",
+        "reconfigure": "PV-Anlage bearbeiten"
+      },
+      "step": {
+        "user": {
+          "title": "PV-Anlage konfigurieren",
+          "description": "Lege den Namen und den Leistungssensor der PV-Anlage fest.",
+          "data": {
+            "pv_name": "Name der PV-Anlage",
+            "pv_leistung": "PV Leistung"
+          },
+          "data_description": {
+            "pv_name": "Wird als eigenes Gerät angezeigt, z. B. \"PV Süddach\".",
+            "pv_leistung": "Aktuelle Leistung der Photovoltaikanlage. Kann in W oder kW angegeben werden.\nDer Wert muss immer positiv sein."
+          }
+        },
+        "reconfigure": {
+          "title": "PV-Anlage konfigurieren",
+          "description": "Lege den Namen und den Leistungssensor der PV-Anlage fest.",
+          "data": {
+            "pv_name": "Name der PV-Anlage",
+            "pv_leistung": "PV Leistung"
+          },
+          "data_description": {
+            "pv_name": "Wird als eigenes Gerät angezeigt, z. B. \"PV Süddach\".",
+            "pv_leistung": "Aktuelle Leistung der Photovoltaikanlage. Kann in W oder kW angegeben werden.\nDer Wert muss immer positiv sein."
+          }
+        }
+      },
+      "abort": {
+        "reconfigure_successful": "Die PV-Anlage wurde aktualisiert.",
+        "entry_not_loaded": "PV-Anlagen können nur hinzugefügt werden, wenn die Integration geladen ist."
+      }
+    },
+    "akku": {
+      "entry_type": "Akku",
+      "initiate_flow": {
+        "user": "Akku hinzufügen",
+        "reconfigure": "Akku bearbeiten"
+      },
+      "step": {
+        "user": {
+          "title": "Akku konfigurieren",
+          "description": "Es kann entweder ein einzelner Sensor für die gesamte Akkuleistung ODER zwei getrennte Sensoren für Laden und Entladen verwendet werden.",
+          "data": {
+            "akku_name": "Name des Akkus",
+            "akku_leistung": "Akku Leistung",
+            "akku_leistung_invertiert": "Vorzeichen ändern",
+            "akku_laden": "Akku laden",
+            "akku_entladen": "Akku entladen",
+            "akku_prio": "Akku hat Priorität und bekommt vorrangig PV Leistung. Erst danach wird das Haus versorgt."
+          },
+          "data_description": {
+            "akku_name": "Wird als eigenes Gerät angezeigt, z. B. \"Akku Garage\".",
+            "akku_leistung": "Gesamtleistung des Akkus. Kann in W oder kW angegeben werden.\nPositiver Wert: Akku entlädt sich.\nNegativer Wert: Akku lädt auf.",
+            "akku_leistung_invertiert": "Positiver Wert: Akku lädt auf.\nNegativer Wert: Akku entlädt sich.",
+            "akku_laden": "Leistung, mit der der Akku geladen wird. Kann in W oder kW angegeben werden.\nDer Wert muss immer positiv sein.",
+            "akku_entladen": "Leistung, mit der der Akku entladen wird. Kann in W oder kW angegeben werden.\nDer Wert muss immer positiv sein.",
+            "akku_prio": "Bspw. für Akkus mit DC-Anschluss und direkter Verbindung zu den PV-Modulen. Die Einstellung gilt nur für diesen Akku.\nStandard ist: PV Leistung versorgt zuerst das Haus und bei Überschuss den Akku."
+          }
+        },
+        "reconfigure": {
+          "title": "Akku konfigurieren",
+          "description": "Es kann entweder ein einzelner Sensor für die gesamte Akkuleistung ODER zwei getrennte Sensoren für Laden und Entladen verwendet werden.",
+          "data": {
+            "akku_name": "Name des Akkus",
+            "akku_leistung": "Akku Leistung",
+            "akku_leistung_invertiert": "Vorzeichen ändern",
+            "akku_laden": "Akku laden",
+            "akku_entladen": "Akku entladen",
+            "akku_prio": "Akku hat Priorität und bekommt vorrangig PV Leistung. Erst danach wird das Haus versorgt."
+          },
+          "data_description": {
+            "akku_name": "Wird als eigenes Gerät angezeigt, z. B. \"Akku Garage\".",
+            "akku_leistung": "Gesamtleistung des Akkus. Kann in W oder kW angegeben werden.\nPositiver Wert: Akku entlädt sich.\nNegativer Wert: Akku lädt auf.",
+            "akku_leistung_invertiert": "Positiver Wert: Akku lädt auf.\nNegativer Wert: Akku entlädt sich.",
+            "akku_laden": "Leistung, mit der der Akku geladen wird. Kann in W oder kW angegeben werden.\nDer Wert muss immer positiv sein.",
+            "akku_entladen": "Leistung, mit der der Akku entladen wird. Kann in W oder kW angegeben werden.\nDer Wert muss immer positiv sein.",
+            "akku_prio": "Bspw. für Akkus mit DC-Anschluss und direkter Verbindung zu den PV-Modulen. Die Einstellung gilt nur für diesen Akku.\nStandard ist: PV Leistung versorgt zuerst das Haus und bei Überschuss den Akku."
+          }
+        }
+      },
+      "error": {
+        "choose_either_total_or_split": "Bitte entweder einen Gesamtsensor ODER zwei getrennte Sensoren auswählen, nicht beides.",
+        "missing_required_sensors": "Bitte eine gültige Kombination von Sensoren auswählen."
+      },
+      "abort": {
+        "reconfigure_successful": "Der Akku wurde aktualisiert.",
+        "entry_not_loaded": "Akkus können nur hinzugefügt werden, wenn die Integration geladen ist."
+      }
+    }
+  },
   "entity": {
     "sensor": {
-      "netz_leistung": { "name": "Netz Leistung" },
-      "netz_bezug": { "name": "Netzbezug" },
-      "netz_einspeisung": { "name": "Netzeinspeisung" },
-
-      "akku_leistung": { "name": "Akku Leistung" },
-      "akku_leistung_inv": { "name": "Akku Leistung (invertiert)" },
-      "akku_entladen": { "name": "Akku entladen" },
-      "akku_laden": { "name": "Akku laden" },
-
-      "haus": { "name": "Haus Leistung" },
-
-      "pv_leistung": { "name": "PV Leistung" },
-      "pv_zu_haus": { "name": "PV zu Haus" },
-      "pv_zu_netz": { "name": "PV zu Netz" },
-      "pv_zu_akku": { "name": "PV zu Akku" },
-
-      "netz_zu_haus": { "name": "Netz zu Haus" },
-      "netz_zu_akku": { "name": "Netz zu Akku" },
-
-      "akku_zu_haus": { "name": "Akku zu Haus" },
-      "akku_zu_netz": { "name": "Akku zu Netz" }
+      "netz_leistung": {
+        "name": "Netz Leistung"
+      },
+      "netz_bezug": {
+        "name": "Netzbezug"
+      },
+      "netz_einspeisung": {
+        "name": "Netzeinspeisung"
+      },
+      "akku_leistung": {
+        "name": "Akku Leistung"
+      },
+      "akku_leistung_inv": {
+        "name": "Akku Leistung (invertiert)"
+      },
+      "akku_entladen": {
+        "name": "Akku entladen"
+      },
+      "akku_laden": {
+        "name": "Akku laden"
+      },
+      "haus": {
+        "name": "Haus Leistung"
+      },
+      "pv_leistung": {
+        "name": "PV Leistung"
+      },
+      "pv_zu_haus": {
+        "name": "PV zu Haus"
+      },
+      "pv_zu_netz": {
+        "name": "PV zu Netz"
+      },
+      "pv_zu_akku": {
+        "name": "PV zu Akku"
+      },
+      "netz_zu_haus": {
+        "name": "Netz zu Haus"
+      },
+      "netz_zu_akku": {
+        "name": "Netz zu Akku"
+      },
+      "akku_zu_haus": {
+        "name": "Akku zu Haus"
+      },
+      "akku_zu_netz": {
+        "name": "Akku zu Netz"
+      },
+      "pv_anlage_leistung": {
+        "name": "Leistung"
+      },
+      "bat_leistung": {
+        "name": "Leistung"
+      },
+      "bat_leistung_inv": {
+        "name": "Leistung (invertiert)"
+      },
+      "bat_laden": {
+        "name": "Laden"
+      },
+      "bat_entladen": {
+        "name": "Entladen"
+      }
     }
   }
 }

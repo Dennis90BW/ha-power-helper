@@ -1,2 +1,12 @@
 # VS Code files
 .vscode/
+# Python / Tests
+__pycache__/
+.venv/
+.venv-min/
+.pytest_cache/
+
+# Lokale Tests (nicht im Repo)
+tests/
+pytest.ini
+requirements_test.txt

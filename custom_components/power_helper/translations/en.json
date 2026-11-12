@@ -23,19 +23,22 @@
         }
       },
       "pv": {
-        "title": "Configure PV power",
-        "description": "OPTIONAL\n\nIn this step, the PV power at the inverter is defined.\nNote: If no PV sensor is selected, all subsequent calculations will be performed without PV generation and fewer sensors will be created.",
+        "title": "Configure PV system",
+        "description": "OPTIONAL\n\nIn this step, you can add your first PV system. Further PV systems can be added later on the integration page via \"Add PV system\".\nNote: Without a PV system, all calculations will be performed without PV generation and fewer sensors will be created.",
         "data": {
+          "pv_name": "PV system name",
           "pv_leistung": "PV power"
         },
         "data_description": {
+          "pv_name": "Shown as its own device, e.g. \"PV south roof\".",
           "pv_leistung": "Current power of the photovoltaic system. Can be provided in W or kW.\nThe value must always be positive."
         }
       },
       "battery": {
-        "title": "Configure battery power",
-        "description": "OPTIONAL\n\nIn this step, you define how the battery power is determined.\nYou can either use a single sensor for total battery power OR two separate sensors for charging and discharging.",
+        "title": "Configure battery",
+        "description": "OPTIONAL\n\nIn this step, you can add your first battery. Further batteries can be added later on the integration page via \"Add battery\".\nYou can either use a single sensor for total battery power OR two separate sensors for charging and discharging.",
         "data": {
+          "akku_name": "Battery name",
           "akku_leistung": "Battery power",
           "akku_leistung_invertiert": "Change sign",
           "akku_laden": "Battery charging",
@@ -43,11 +46,12 @@
           "akku_prio": "Battery priority"
         },
         "data_description": {
+          "akku_name": "Shown as its own device, e.g. \"Garage battery\".",
           "akku_leistung": "Total battery power. Can be provided in W or kW.\nPositive value: battery is discharging.\nNegative value: battery is charging.",
           "akku_leistung_invertiert": "Positive value: battery is charging.\nNegative value: battery is discharging.",
           "akku_laden": "Power at which the battery is being charged. Can be provided in W or kW.\nThe value must always be positive.",
           "akku_entladen": "Power at which the battery is being discharged. Can be provided in W or kW.\nThe value must always be positive.",
-          "akku_prio": "The battery is supplied with PV power first, and the house is supplied afterwards.\n\nFor example, for batteries with a DC connection and a direct link to the PV modules.\nDefault behavior: PV power supplies the house first and charges the battery with surplus energy."
+          "akku_prio": "This battery is supplied with PV power first, and the house is supplied afterwards. Applies to this battery only.\n\nFor example, for batteries with a DC connection and a direct link to the PV modules.\nDefault behavior: PV power supplies the house first and charges the battery with surplus energy."
         }
       }
     },
@@ -56,18 +60,8 @@
       "missing_required_sensors": "Please select a valid combination of sensors."
     }
   },
-
   "options": {
     "step": {
-      "select_step": {
-        "title": "Options",
-        "data": {
-          "step": "Choose your configuration"
-        },
-        "data_description": {
-          "step": "Note: Entities can only be added or changed, but existing entities cannot be removed. To remove an entity, you must recreate the integration."
-        }
-      },
       "grid": {
         "title": "Configure grid power",
         "description": "In this step, you define how the power at the electricity meter is determined.\nYou can either use a single sensor for total grid power OR two separate sensors for grid consumption and grid feed-in.",
@@ -81,34 +75,6 @@
           "netz_bezug": "Power consumed from the grid. Can be provided in W or kW.\nThe value must always be positive.",
           "netz_einspeisung": "Power fed into the grid. Can be provided in W or kW.\nThe value must always be positive."
         }
-      },
-      "pv": {
-        "title": "Configure PV power",
-        "description": "OPTIONAL\n\nIn this step, the PV power at the inverter is defined.\nNote: If no PV sensor is selected, all subsequent calculations will be performed without PV generation and fewer sensors will be created.",
-        "data": {
-          "pv_leistung": "PV power"
-        },
-        "data_description": {
-          "pv_leistung": "Current power of the photovoltaic system. Can be provided in W or kW.\nThe value must always be positive."
-        }
-      },
-      "battery": {
-        "title": "Configure battery power",
-        "description": "OPTIONAL\n\nIn this step, you define how the battery power is determined.\nYou can either use a single sensor for total battery power OR two separate sensors for charging and discharging.",
-        "data": {
-          "akku_leistung": "Battery power",
-          "akku_leistung_invertiert": "Change sign",
-          "akku_laden": "Battery charging",
-          "akku_entladen": "Battery discharging",
-          "akku_prio": "Battery priority"
-        },
-        "data_description": {
-          "akku_leistung": "Total battery power. Can be provided in W or kW.\nPositive value: battery is discharging.\nNegative value: battery is charging.",
-          "akku_leistung_invertiert": "Positive value: battery is charging.\nNegative value: battery is discharging.",
-          "akku_laden": "Power at which the battery is being charged. Can be provided in W or kW.\nThe value must always be positive.",
-          "akku_entladen": "Power at which the battery is being discharged. Can be provided in W or kW.\nThe value must always be positive.",
-          "akku_prio": "The battery is supplied with PV power first, and the house is supplied afterwards.\n\nFor example, for batteries with a DC connection and a direct link to the PV modules.\nDefault behavior: PV power supplies the house first and charges the battery with surplus energy."
-        }
       }
     },
     "error": {
@@ -116,30 +82,167 @@
       "missing_required_sensors": "Please select a valid combination of sensors."
     }
   },
-
+  "config_subentries": {
+    "pv": {
+      "entry_type": "PV system",
+      "initiate_flow": {
+        "user": "Add PV system",
+        "reconfigure": "Edit PV system"
+      },
+      "step": {
+        "user": {
+          "title": "Configure PV system",
+          "description": "Set the name and the power sensor of the PV system.",
+          "data": {
+            "pv_name": "PV system name",
+            "pv_leistung": "PV power"
+          },
+          "data_description": {
+            "pv_name": "Shown as its own device, e.g. \"PV south roof\".",
+            "pv_leistung": "Current power of the photovoltaic system. Can be provided in W or kW.\nThe value must always be positive."
+          }
+        },
+        "reconfigure": {
+          "title": "Configure PV system",
+          "description": "Set the name and the power sensor of the PV system.",
+          "data": {
+            "pv_name": "PV system name",
+            "pv_leistung": "PV power"
+          },
+          "data_description": {
+            "pv_name": "Shown as its own device, e.g. \"PV south roof\".",
+            "pv_leistung": "Current power of the photovoltaic system. Can be provided in W or kW.\nThe value must always be positive."
+          }
+        }
+      },
+      "abort": {
+        "reconfigure_successful": "The PV system was updated.",
+        "entry_not_loaded": "PV systems can only be added while the integration is loaded."
+      }
+    },
+    "akku": {
+      "entry_type": "Battery",
+      "initiate_flow": {
+        "user": "Add battery",
+        "reconfigure": "Edit battery"
+      },
+      "step": {
+        "user": {
+          "title": "Configure battery",
+          "description": "You can either use a single sensor for total battery power OR two separate sensors for charging and discharging.",
+          "data": {
+            "akku_name": "Battery name",
+            "akku_leistung": "Battery power",
+            "akku_leistung_invertiert": "Change sign",
+            "akku_laden": "Battery charging",
+            "akku_entladen": "Battery discharging",
+            "akku_prio": "Battery priority"
+          },
+          "data_description": {
+            "akku_name": "Shown as its own device, e.g. \"Garage battery\".",
+            "akku_leistung": "Total battery power. Can be provided in W or kW.\nPositive value: battery is discharging.\nNegative value: battery is charging.",
+            "akku_leistung_invertiert": "Positive value: battery is charging.\nNegative value: battery is discharging.",
+            "akku_laden": "Power at which the battery is being charged. Can be provided in W or kW.\nThe value must always be positive.",
+            "akku_entladen": "Power at which the battery is being discharged. Can be provided in W or kW.\nThe value must always be positive.",
+            "akku_prio": "This battery is supplied with PV power first, and the house is supplied afterwards. Applies to this battery only.\n\nFor example, for batteries with a DC connection and a direct link to the PV modules.\nDefault behavior: PV power supplies the house first and charges the battery with surplus energy."
+          }
+        },
+        "reconfigure": {
+          "title": "Configure battery",
+          "description": "You can either use a single sensor for total battery power OR two separate sensors for charging and discharging.",
+          "data": {
+            "akku_name": "Battery name",
+            "akku_leistung": "Battery power",
+            "akku_leistung_invertiert": "Change sign",
+            "akku_laden": "Battery charging",
+            "akku_entladen": "Battery discharging",
+            "akku_prio": "Battery priority"
+          },
+          "data_description": {
+            "akku_name": "Shown as its own device, e.g. \"Garage battery\".",
+            "akku_leistung": "Total battery power. Can be provided in W or kW.\nPositive value: battery is discharging.\nNegative value: battery is charging.",
+            "akku_leistung_invertiert": "Positive value: battery is charging.\nNegative value: battery is discharging.",
+            "akku_laden": "Power at which the battery is being charged. Can be provided in W or kW.\nThe value must always be positive.",
+            "akku_entladen": "Power at which the battery is being discharged. Can be provided in W or kW.\nThe value must always be positive.",
+            "akku_prio": "This battery is supplied with PV power first, and the house is supplied afterwards. Applies to this battery only.\n\nFor example, for batteries with a DC connection and a direct link to the PV modules.\nDefault behavior: PV power supplies the house first and charges the battery with surplus energy."
+          }
+        }
+      },
+      "error": {
+        "choose_either_total_or_split": "Please choose either a total sensor OR two separate sensors, not both.",
+        "missing_required_sensors": "Please select a valid combination of sensors."
+      },
+      "abort": {
+        "reconfigure_successful": "The battery was updated.",
+        "entry_not_loaded": "Batteries can only be added while the integration is loaded."
+      }
+    }
+  },
   "entity": {
     "sensor": {
-      "netz_leistung": { "name": "Grid Power" },
-      "netz_bezug": { "name": "Grid Consumption" },
-      "netz_einspeisung": { "name": "Grid Feed-in" },
-
-      "akku_leistung": { "name": "Battery Power" },
-      "akku_leistung_inv": { "name": "Battery Power (Inverted)" },
-      "akku_entladen": { "name": "Battery Discharging" },
-      "akku_laden": { "name": "Battery Charging" },
-
-      "haus": { "name": "Home Power" },
-
-      "pv_leistung": { "name": "PV Power" },
-      "pv_zu_haus": { "name": "PV to Home" },
-      "pv_zu_netz": { "name": "PV to Grid" },
-      "pv_zu_akku": { "name": "PV to Battery" },
-
-      "netz_zu_haus": { "name": "Grid to Home" },
-      "netz_zu_akku": { "name": "Grid to Battery" },
-
-      "akku_zu_haus": { "name": "Battery to Home" },
-      "akku_zu_netz": { "name": "Battery to Grid" }
+      "netz_leistung": {
+        "name": "Grid Power"
+      },
+      "netz_bezug": {
+        "name": "Grid Consumption"
+      },
+      "netz_einspeisung": {
+        "name": "Grid Feed-in"
+      },
+      "akku_leistung": {
+        "name": "Battery Power"
+      },
+      "akku_leistung_inv": {
+        "name": "Battery Power (Inverted)"
+      },
+      "akku_entladen": {
+        "name": "Battery Discharging"
+      },
+      "akku_laden": {
+        "name": "Battery Charging"
+      },
+      "haus": {
+        "name": "Home Power"
+      },
+      "pv_leistung": {
+        "name": "PV Power"
+      },
+      "pv_zu_haus": {
+        "name": "PV to Home"
+      },
+      "pv_zu_netz": {
+        "name": "PV to Grid"
+      },
+      "pv_zu_akku": {
+        "name": "PV to Battery"
+      },
+      "netz_zu_haus": {
+        "name": "Grid to Home"
+      },
+      "netz_zu_akku": {
+        "name": "Grid to Battery"
+      },
+      "akku_zu_haus": {
+        "name": "Battery to Home"
+      },
+      "akku_zu_netz": {
+        "name": "Battery to Grid"
+      },
+      "pv_anlage_leistung": {
+        "name": "Power"
+      },
+      "bat_leistung": {
+        "name": "Power"
+      },
+      "bat_leistung_inv": {
+        "name": "Power (Inverted)"
+      },
+      "bat_laden": {
+        "name": "Charging"
+      },
+      "bat_entladen": {
+        "name": "Discharging"
+      }
     }
   }
 }

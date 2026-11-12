@@ -24,12 +24,12 @@ This is my first GitHub project, and the custom integration was created with the
 
 - 🧩 Automatically creates missing **combined or separate power sensors** for **grid** and **battery**
 - 🔌 Power flow breakdown (PV, grid, battery, home)
-- ➕ Multiple PV systems can be added
 - 🔋 Battery power can be inverted
+- ➕ Multiple PV systems and batteries can be added
 - ⚙️ Easy setup and editing via the UI
 - 📊 Output in **watts (W)**
 - 🔄 Supports sensors in **W** and **kW**
-- 🌍 Multilingual (**DE / EN**)
+- 🌍 Multilingual (DE / EN)
 
 ---
 
@@ -45,9 +45,9 @@ This is my first GitHub project, and the custom integration was created with the
 
 ## 🚀 Installation
 
-### 🔹 HACS (recommended)
+### 🔹 Marketplace (recommended)
 
-1. Open **HACS**
+1. Open the **Marketplace** (before HA 2026.11: **HACS**)
 2. Search for **powerHELPER**
 3. Click **Download**
 4. Restart Home Assistant
@@ -72,37 +72,65 @@ This is my first GitHub project, and the custom integration was created with the
 
 ---
 
-## 🧠 Created Sensors
+## 🧠 Created Sensors and Devices
 
-### 🔌 Grid
-#### Input
-- `sensor.device_grid_power` — Grid power
-- `sensor.device_grid_consumption` — Grid consumption
-- `sensor.device_grid_feed_in` — Grid feed-in
-#### Power flow
-- `sensor.device_grid_to_home` — Grid → Home
-- `sensor.device_grid_to_battery` — Grid → Battery
+powerHELPER creates a **main device** and below it **one device per PV system and per battery**.
+Add further PV systems and batteries on the integration page via **Add PV system** or **Add battery**; edit and delete them via the menu of each system.
 
-### ☀️ PV
-#### Input
-- `sensor.device_pv_power` — PV power
-#### Power flow
-- `sensor.device_pv_to_home` — PV → Home
-- `sensor.device_pv_to_battery` — PV → Battery
-- `sensor.device_pv_to_grid` — PV → Grid
+Entity IDs are built from the device name and the sensor name (e.g. `<device>` = `powerhelper`).
 
-### 🔋 Battery
-#### Input
-- `sensor.device_battery_power` — Battery power
-- `sensor.device_battery_power_inverted` — Battery power inverted
-- `sensor.device_battery_charging` — Battery charging
-- `sensor.device_battery_discharging` — Battery discharging
-#### Power flow
-- `sensor.device_battery_to_home` — Battery → Home
-- `sensor.device_battery_to_grid` — Battery → Grid
+### 🏠 Main device powerHELPER
 
-### 🏠 Home
-- `sensor.device_home_power` — Home power
+#### 🔌 Grid
+| Entity | Name |
+|---|---|
+| `sensor.<device>_grid_power` | Grid Power |
+| `sensor.<device>_grid_consumption` | Grid Consumption |
+| `sensor.<device>_grid_feed_in` | Grid Feed-in |
+
+#### ☀️ PV – total of all PV systems
+| Entity | Name |
+|---|---|
+| `sensor.<device>_pv_power` | PV Power |
+
+#### 🔋 Battery – total of all batteries
+Multiple batteries are netted against each other first: if one battery charges while another discharges, that power only flows between the batteries.
+
+| Entity | Name |
+|---|---|
+| `sensor.<device>_battery_power` | Battery Power *positive = discharging* |
+| `sensor.<device>_battery_power_inverted` | Battery Power (Inverted) *positive = charging* |
+| `sensor.<device>_battery_charging` | Battery Charging |
+| `sensor.<device>_battery_discharging` | Battery Discharging |
+
+#### 🔀 Power flows
+| Entity | Name |
+|---|---|
+| `sensor.<device>_pv_to_home` | PV to Home |
+| `sensor.<device>_pv_to_battery` | PV to Battery |
+| `sensor.<device>_pv_to_grid` | PV to Grid |
+| `sensor.<device>_grid_to_home` | Grid to Home |
+| `sensor.<device>_grid_to_battery` | Grid to Battery |
+| `sensor.<device>_battery_to_home` | Battery to Home |
+| `sensor.<device>_battery_to_grid` | Battery to Grid |
+
+#### 🏠 Home
+| Entity | Name |
+|---|---|
+| `sensor.<device>_home_power` | Home Power |
+
+### ☀️ Connected device per PV system
+| Entity | Name |
+|---|---|
+| `sensor.<pv-system>_power` | Power |
+
+### 🔋 Connected device per battery
+| Entity | Name |
+|---|---|
+| `sensor.<battery>_power` | Power *positive = discharging* |
+| `sensor.<battery>_power_inverted` | Power (Inverted) *positive = charging* |
+| `sensor.<battery>_charging` | Charging |
+| `sensor.<battery>_discharging` | Discharging |
 
 All sensors provide **watts (W)** and are fully dashboard-ready.
 
@@ -120,7 +148,7 @@ DC sensors, such as those coming directly from inverters in the PV system or cer
 
 ## 🧪 Status
 
-Version: **1.0.7**  
+Version: **2.0.0**
 
 Tested with PV + battery systems
 
@@ -128,7 +156,7 @@ Tested with PV + battery systems
 
 ## 📄 License
 
-MIT License  
+MIT License
 
 Copyright (c) 2026 Dennis
 

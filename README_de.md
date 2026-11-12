@@ -25,7 +25,7 @@ Dies ist mein erstes GitHub-Projekt und die Custom Integration wurde mithilfe vo
 - 🧩 Erstellt automatisch fehlende **kombinierte oder getrennte Leistungssensoren** für **Netz-** und **Akkuleistung**
 - 🔌 Aufteilung von Leistungsflüssen (PV, Netz, Akku, Haus)
 - 🔋 Akku-Leistung kann invertiert werden
-- ➕ Mehrere PV-Anlagen können hinzugefügt werden
+- ➕ Mehrere PV-Anlagen und Akkus können hinzugefügt werden
 - ⚙️ Einfache Einrichtung und Bearbeitung über die UI
 - 📊 Ausgabe in **Watt (W)**
 - 🔄 Unterstützt Sensoren in **W** und **kW**
@@ -45,9 +45,9 @@ Dies ist mein erstes GitHub-Projekt und die Custom Integration wurde mithilfe vo
 
 ## 🚀 Installation
 
-### 🔹 HACS (empfohlen)
+### 🔹 Marketplace (empfohlen)
 
-1. Öffne **HACS**
+1. Öffne den **Marketplace** (vor HA 2026.11: **HACS**)
 2. Suche nach **powerHELPER**
 3. auf **Herunterladen** klicken
 4. Home Assistant neu starten
@@ -72,38 +72,65 @@ Dies ist mein erstes GitHub-Projekt und die Custom Integration wurde mithilfe vo
 
 ---
 
-## 🧠 Erzeugte Sensoren
+## 🧠 Erzeugte Sensoren und Geräte
 
-### 🔌 Netz
+powerHELPER legt ein **Hauptgerät** an und darunter **je PV-Anlage und je Akku ein eigenes Gerät**.
+Weitere PV-Anlagen und Akkus fügst du auf der Integrationsseite über **PV-Anlage hinzufügen** bzw. **Akku hinzufügen** hinzu; bearbeiten und löschen geht über das Menü der jeweiligen Anlage.
 
-#### Input
-- `sensor.gerät_netz_leistung` — Netz Leistung
-- `sensor.gerät_netzbezug` — Netzbezug
-- `sensor.gerät_netzeinspeisung` — Netzeinspeisung
-#### Leistungsfluss
-- `sensor.gerät_netz_zu_haus` — Netz → Haus
-- `sensor.gerät_netz_zu_akku` — Netz → Akku
+Die Entity-IDs entstehen aus Gerätename und Sensorname (z. B. `<gerät>` = `powerhelper`).
 
-### ☀️ PV
-#### Input
-- `sensor.gerät_pv_leistung` — PV Leistung
-#### Leistungsfluss
-- `sensor.gerät_pv_zu_haus` — PV → Haus
-- `sensor.gerät_pv_zu_akku` — PV → Akku
-- `sensor.gerät_pv_zu_netz` — PV → Netz
+### 🏠 Hauptgerät powerHELPER
 
-### 🔋 Akku
-#### Input
-- `sensor.gerät_akku_leistung` — Akku Leistung
-- `sensor.gerät_akku_leistung_invertiert` — Akku Leistung invertiert
-- `sensor.gerät_akku_laden` — Akku laden
-- `sensor.gerät_akku_entladen` — Akku entladen
-#### Leistungsfluss
-- `sensor.gerät_akku_zu_haus` — Akku → Haus
-- `sensor.gerät_akku_zu_netz` — Akku → Netz
+#### 🔌 Netz
+| Entität | Name |
+|---|---|
+| `sensor.<gerät>_netz_leistung` | Netz Leistung |
+| `sensor.<gerät>_netzbezug` | Netzbezug |
+| `sensor.<gerät>_netzeinspeisung` | Netzeinspeisung |
 
-### 🏠 Haus
-- `sensor.gerät_haus_leistung` — Haus Leistung
+#### ☀️ PV – Summe aller PV-Anlagen
+| Entität | Name |
+|---|---|
+| `sensor.<gerät>_pv_leistung` | PV Leistung |
+
+#### 🔋 Akku – Summe aller Akkus
+Mehrere Akkus werden zuerst miteinander verrechnet: Lädt ein Akku, während ein anderer entlädt, fließt diese Leistung nur zwischen den Akkus.
+
+| Entität | Name |
+|---|---|
+| `sensor.<gerät>_akku_leistung` | Akku Leistung *positiv = Entladen* |
+| `sensor.<gerät>_akku_leistung_invertiert` | Akku Leistung (invertiert) *positiv = Laden* |
+| `sensor.<gerät>_akku_laden` | Akku laden |
+| `sensor.<gerät>_akku_entladen` | Akku entladen |
+
+#### 🔀 Leistungsflüsse
+| Entität | Name |
+|---|---|
+| `sensor.<gerät>_pv_zu_haus` | PV zu Haus |
+| `sensor.<gerät>_pv_zu_akku` | PV zu Akku |
+| `sensor.<gerät>_pv_zu_netz` | PV zu Netz |
+| `sensor.<gerät>_netz_zu_haus` | Netz zu Haus |
+| `sensor.<gerät>_netz_zu_akku` | Netz zu Akku |
+| `sensor.<gerät>_akku_zu_haus` | Akku zu Haus |
+| `sensor.<gerät>_akku_zu_netz` | Akku zu Netz |
+
+#### 🏠 Haus
+| Entität | Name |
+|---|---|
+| `sensor.<gerät>_haus_leistung` | Haus Leistung |
+
+### ☀️ Verbundenes Gerät je PV-Anlage
+| Entität | Name |
+|---|---|
+| `sensor.<pv-anlage>_leistung` | Leistung |
+
+### 🔋 Verbundenes Gerät je Akku
+| Entität | Name |
+|---|---|
+| `sensor.<akku>_leistung` | Leistung *positiv = Entladen* |
+| `sensor.<akku>_leistung_invertiert` | Leistung (invertiert) *positiv = Laden* |
+| `sensor.<akku>_laden` | Laden |
+| `sensor.<akku>_entladen` | Entladen |
 
 Alle Sensoren liefern **Watt (W)** und sind Dashboard-fähig.
 
@@ -121,7 +148,7 @@ DC-Sensoren, wie sie beispielsweise von Wechselrichtern direkt aus der PV-Anlage
 
 ## 🧪 Status
 
-Version: **1.0.7**
+Version: **2.0.0**
 
 Getestet mit PV + Akku Systemen
 

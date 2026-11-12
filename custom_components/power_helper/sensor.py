@@ -1,201 +1,171 @@
 from __future__ import annotations
 
+from dataclasses import dataclass
+
 from homeassistant.components.sensor import (
-    SensorEntity,
     SensorDeviceClass,
+    SensorEntity,
     SensorStateClass,
 )
-from homeassistant.config_entries import ConfigEntry
-from homeassistant.core import HomeAssistant, callback
-from homeassistant.helpers.event import async_track_state_change_event
-from homeassistant.helpers.entity import DeviceInfo, EntityCategory
 from homeassistant.const import UnitOfPower
+from homeassistant.core import HomeAssistant
+from homeassistant.helpers import device_registry as dr
+from homeassistant.helpers import entity_registry as er
+from homeassistant.helpers.entity import DeviceInfo, EntityCategory
+from homeassistant.loader import async_get_loaded_integration
 
-from .const import DOMAIN
+from .const import DOMAIN, NAME
+from .hub import PowerHelperHub
 
-# =====================================================================
-# HELPERS
-# =====================================================================
 
-def power_in_watt(hass: HomeAssistant, entry: ConfigEntry, entity_id: str) -> float:
-    """Return power in Watt, normalized from W / kW."""
-    data = entry.options or entry.data
-    try:
-        state = hass.states.get(entity_id)
-        if state is None or state.state in (None, "unknown", "unavailable"):
-            return 0.0
+@dataclass(frozen=True)
+class SensorSpec:
+    """Welche Entität angelegt wird und wie sie sich standardmäßig verhält."""
 
-        value = float(state.state)
-        unit = state.attributes.get("unit_of_measurement")
-
-        if unit in (UnitOfPower.KILO_WATT, "kW"):
-            return value * 1000
-        
-        # Akku-Invertierung
-        if entity_id == data.get("akku_leistung"):
-            invert = data.get("akku_leistung_invertiert", False)
-            if invert:
-                return -value
-
-        return value
-    except Exception:
-        return 0.0
-
-def sum_pv_power(hass: HomeAssistant, entry: ConfigEntry) -> float:
-    """Return the sum of all PV sensors in Watt."""
-    data = entry.options or entry.data
-    pv_sensors = data.get("pv_leistung")
-
-    if not pv_sensors:
-        return 0.0
-
-    # Falls nur ein einzelner Sensor angegeben wurde, in eine Liste packen
-    if isinstance(pv_sensors, str):
-        pv_sensors = [pv_sensors]
-
-    total = 0.0
-    for sensor_id in pv_sensors:
-        try:
-            state = hass.states.get(sensor_id)
-            if state is None or state.state in (None, "unknown", "unavailable"):
-                continue
-
-            value = float(state.state)
-            unit = state.attributes.get("unit_of_measurement")
-
-            if unit in (UnitOfPower.KILO_WATT, "kW"):
-                value *= 1000
-
-            total += value
-        except Exception:
-            continue
-
-    return total
+    key: str  # Schlüssel in hub.values und Teil der unique_id
+    translation_key: str
+    enabled: bool = True
+    diagnostic: bool = False
 
 
 # =====================================================================
 # SETUP
 # =====================================================================
 
-async def async_setup_entry(hass: HomeAssistant, entry: ConfigEntry, async_add_entities):
-    sensors: list[SensorEntity] = []
-    data = entry.options or entry.data
+async def async_setup_entry(hass: HomeAssistant, entry, async_add_entities):
+    hub: PowerHelperHub = entry.runtime_data
+    # Version nur an einer Stelle pflegen: manifest.json
+    sw_version = str(async_get_loaded_integration(hass, DOMAIN).version)
+    main_device = DeviceInfo(
+        identifiers={(DOMAIN, entry.entry_id)},
+        name=entry.title,
+        manufacturer="Dennis90BW",
+        model=NAME,
+        sw_version=sw_version,
+    )
+
+    specs: list[SensorSpec] = []
 
     # ==================== GRID ====================
-
-    if data.get("netz_leistung") and not (data.get("netz_bezug") and data.get("netz_einspeisung")):
-        sensors += [
-            ProxyPowerSensor(hass, source_entity=data["netz_leistung"], entry=entry, key="netz_leistung"),
-            SplitPowerSensor(
-                hass,
-                source_entity=data["netz_leistung"],
-                entry=entry,
-                key="netz_bezug",
-                positive=True,
-            ),
-            SplitPowerSensor(
-                hass,
-                source_entity=data["netz_leistung"],
-                entry=entry,
-                key="netz_einspeisung",
-                positive=False,
-            ),
+    if hub.grid_is_split:
+        specs += [
+            SensorSpec("netz_bezug", "netz_bezug", enabled=False, diagnostic=True),
+            SensorSpec("netz_einspeisung", "netz_einspeisung", enabled=False, diagnostic=True),
+            SensorSpec("netz_leistung", "netz_leistung"),
         ]
-
-    if not data.get("netz_leistung") and (data.get("netz_bezug") and data.get("netz_einspeisung")):
-        sensors += [
-            ProxyPowerSensor(hass, source_entity=data["netz_bezug"], entry=entry, key="netz_bezug"),
-            ProxyPowerSensor(hass, source_entity=data["netz_einspeisung"], entry=entry, key="netz_einspeisung"),
-            CombinedPowerSensor(
-                hass,
-                pos_entity=data["netz_bezug"],
-                neg_entity=data["netz_einspeisung"],
-                entry=entry,
-                key="netz_leistung",
-                ena_def=True,
-            ),
-        ]
-
-    # ==================== BATTERY ====================
-
-    if data.get("akku_leistung") and not (data.get("akku_laden") and data.get("akku_entladen")):
-        sensors += [
-            ProxyPowerSensor(hass, source_entity=data["akku_leistung"], entry=entry, key="akku_leistung"),
-            InvertedPowerSensor(hass, source_entity=data["akku_leistung"], entry=entry, key="akku_leistung_inv"),
-            SplitPowerSensor(
-                hass,
-                source_entity=data["akku_leistung"],
-                entry=entry,
-                key="akku_entladen",
-                positive=True,
-            ),
-            SplitPowerSensor(
-                hass,
-                source_entity=data["akku_leistung"],
-                entry=entry,
-                key="akku_laden",
-                positive=False,
-            ),
-        ]
-
-    if not data.get("akku_leistung") and (data.get("akku_laden") and data.get("akku_entladen")):
-        sensors += [
-            ProxyPowerSensor(hass, source_entity=data["akku_laden"], entry=entry, key="akku_laden"),
-            ProxyPowerSensor(hass, source_entity=data["akku_entladen"], entry=entry, key="akku_entladen"),
-            CombinedPowerSensor(
-                hass,
-                pos_entity=data["akku_entladen"],
-                neg_entity=data["akku_laden"],
-                entry=entry,
-                key="akku_leistung",
-                ena_def=True
-            ),
-            CombinedPowerSensor(
-                hass,
-                pos_entity=data["akku_laden"],
-                neg_entity=data["akku_entladen"],
-                entry=entry,
-                key="akku_leistung_inv",
-                ena_def=False
-            ),
+    elif hub.grid_power:
+        specs += [
+            SensorSpec("netz_leistung", "netz_leistung", enabled=False, diagnostic=True),
+            SensorSpec("netz_bezug", "netz_bezug"),
+            SensorSpec("netz_einspeisung", "netz_einspeisung"),
         ]
 
     # ==================== FLOWS ====================
+    has_bat = bool(hub.batteries)
+    specs.append(SensorSpec("haus", "haus"))
 
-    flows = {
-        "netz": data.get("netz_leistung"),
-        "akku": data.get("akku_leistung"),
-        "netz_bezug": data.get("netz_bezug"),
-        "netz_einspeisung": data.get("netz_einspeisung"),
-        "akku_laden": data.get("akku_laden"),
-        "akku_entladen": data.get("akku_entladen"),
-    }
+    if hub.pv:
+        specs += [
+            SensorSpec("pv_leistung", "pv_leistung"),
+            SensorSpec("pv_zu_haus", "pv_zu_haus"),
+            SensorSpec("pv_zu_netz", "pv_zu_netz"),
+        ]
+        if has_bat:
+            specs.append(SensorSpec("pv_zu_akku", "pv_zu_akku"))
 
-    sensors.append(FlowPowerSensor(hass, entry, "haus", flows))
+    specs.append(SensorSpec("netz_zu_haus", "netz_zu_haus"))
 
-    if data.get("pv_leistung"):
-        sensors.append(ProxyPvSumPowerSensor(hass, entry=entry, key="pv_leistung"))
-        sensors.append(FlowPowerSensor(hass, entry, "pv_zu_haus", flows))
-        sensors.append(FlowPowerSensor(hass, entry, "pv_zu_netz", flows))
+    # ==================== BATTERY (gesamt) ====================
+    if has_bat:
+        specs += [
+            SensorSpec("akku_leistung", "akku_leistung"),
+            SensorSpec("akku_leistung_inv", "akku_leistung_inv", enabled=False),
+            SensorSpec("akku_laden", "akku_laden"),
+            SensorSpec("akku_entladen", "akku_entladen"),
+            SensorSpec("netz_zu_akku", "netz_zu_akku"),
+            SensorSpec("akku_zu_haus", "akku_zu_haus"),
+            SensorSpec("akku_zu_netz", "akku_zu_netz"),
+        ]
 
-        if data.get("akku_leistung") or (data.get("akku_laden") and data.get("akku_entladen")):
-            sensors.append(FlowPowerSensor(hass, entry, "pv_zu_akku", flows))
+    main_entities = [
+        PowerHelperSensor(
+            hub,
+            spec,
+            unique_id=f"{DOMAIN}_{entry.entry_id}_{spec.key}",
+            device_info=main_device,
+        )
+        for spec in specs
+    ]
 
-    sensors.append(FlowPowerSensor(hass, entry, "netz_zu_haus", flows))
+    # ==================== PV-ANLAGEN UND AKKUS (je Subentry ein Gerät) ====================
+    # Geräte vorab anlegen und per via_device_id unter das Hauptgerät hängen.
+    # (`via_device` in DeviceInfo ist ab HA 2026.11 veraltet, `via_device_id`
+    # in DeviceInfo gibt es in älteren Versionen noch nicht – dieser Weg geht mit beiden.)
+    dev_reg = dr.async_get(hass)
+    main_dev = dev_reg.async_get_or_create(config_entry_id=entry.entry_id, **main_device)
 
-    if data.get("akku_leistung") or (data.get("akku_laden") and data.get("akku_entladen")):
-        sensors.append(FlowPowerSensor(hass, entry, "netz_zu_akku", flows))
-        sensors.append(FlowPowerSensor(hass, entry, "akku_zu_haus", flows))
-        sensors.append(FlowPowerSensor(hass, entry, "akku_zu_netz", flows))
+    sub_items: list[tuple[str, str, str, list[SensorSpec]]] = [
+        (pv.subentry_id, pv.title, f"{NAME} PV", PV_SPECS) for pv in hub.pv
+    ] + [
+        (bat.subentry_id, bat.title, f"{NAME} Akku", BATTERY_SPECS) for bat in hub.batteries
+    ]
 
-    async_add_entities(sensors)
+    sub_entities: dict[str, list[PowerHelperSensor]] = {}
+    for sid, title, model, sub_specs in sub_items:
+        device = DeviceInfo(
+            identifiers={(DOMAIN, f"{entry.entry_id}_{sid}")},
+            name=title,
+            manufacturer="Dennis90BW",
+            model=model,
+            sw_version=sw_version,
+        )
+        sub_dev = dev_reg.async_get_or_create(
+            config_entry_id=entry.entry_id, config_subentry_id=sid, **device
+        )
+        if sub_dev.via_device_id != main_dev.id:
+            dev_reg.async_update_device(sub_dev.id, via_device_id=main_dev.id)
+        sub_entities[sid] = [
+            PowerHelperSensor(
+                hub,
+                SensorSpec(f"{sid}_{s.key}", s.translation_key, s.enabled, s.diagnostic),
+                unique_id=f"{DOMAIN}_{entry.entry_id}_{sid}_{s.key}",
+                device_info=device,
+            )
+            for s in sub_specs
+        ]
+
+    # Entitäten entfernen, die nach einer Änderung nicht mehr erzeugt werden
+    # (z. B. wenn ein Quellsensor entfernt wurde), damit keine verwaisten Einträge bleiben.
+    ent_reg = er.async_get(hass)
+    valid_unique_ids = {e.unique_id for e in main_entities}
+    for entities in sub_entities.values():
+        valid_unique_ids |= {e.unique_id for e in entities}
+    for reg_entry in er.async_entries_for_config_entry(ent_reg, entry.entry_id):
+        if reg_entry.unique_id not in valid_unique_ids:
+            ent_reg.async_remove(reg_entry.entity_id)
+
+    async_add_entities(main_entities)
+    for subentry_id, entities in sub_entities.items():
+        async_add_entities(entities, config_subentry_id=subentry_id)
+
+
+PV_SPECS = [
+    SensorSpec("leistung", "pv_anlage_leistung"),
+]
+
+BATTERY_SPECS = [
+    SensorSpec("leistung", "bat_leistung"),
+    SensorSpec("leistung_inv", "bat_leistung_inv", enabled=False),
+    SensorSpec("laden", "bat_laden"),
+    SensorSpec("entladen", "bat_entladen"),
+]
 
 
 # =====================================================================
-# BASE
+# ENTITY
 # =====================================================================
 
-class BasePhSensor(SensorEntity):
+class PowerHelperSensor(SensorEntity):
     _attr_should_poll = False
     _attr_device_class = SensorDeviceClass.POWER
     _attr_state_class = SensorStateClass.MEASUREMENT
@@ -203,206 +173,26 @@ class BasePhSensor(SensorEntity):
     _attr_icon = "mdi:lightning-bolt-circle"
     _attr_has_entity_name = True
 
-    def __init__(self, *, entry: ConfigEntry, key: str):
-        self._entry = entry
-        self._attr_translation_key = key
-        self._attr_unique_id = f"{DOMAIN}_{entry.entry_id}_{key}"
-        self._attr_device_info = DeviceInfo(
-            identifiers={(DOMAIN, entry.entry_id)},
-            name=entry.title,
-            manufacturer="Dennis90BW",
-            model="powerHELPER",
-            sw_version="1.0.7",
-        )
+    def __init__(
+        self,
+        hub: PowerHelperHub,
+        spec: SensorSpec,
+        *,
+        unique_id: str,
+        device_info: DeviceInfo,
+    ) -> None:
+        self._hub = hub
+        self._key = spec.key
+        self._attr_translation_key = spec.translation_key
+        self._attr_unique_id = unique_id
+        self._attr_device_info = device_info
+        self._attr_entity_registry_enabled_default = spec.enabled
+        if spec.diagnostic:
+            self._attr_entity_category = EntityCategory.DIAGNOSTIC
 
+    @property
+    def native_value(self) -> float:
+        return self._hub.values.get(self._key, 0.0)
 
-# =====================================================================
-# PROXY
-# =====================================================================
-
-class ProxyPowerSensor(BasePhSensor):
-    def __init__(self, hass, *, source_entity, entry, key):
-        super().__init__(entry=entry, key=key)
-        self.hass = hass
-        self._source = source_entity
-        self._attr_entity_registry_enabled_default = False
-        self._attr_entity_category = EntityCategory.DIAGNOSTIC
-
-    async def async_added_to_hass(self):
-        async_track_state_change_event(self.hass, [self._source], self._changed)
-        self._update()
-
-    @callback
-    def _changed(self, event):
-        self._update()
-
-    def _update(self):
-        self._attr_native_value = power_in_watt(self.hass, self._entry, self._source)
-        self.async_write_ha_state()
-
-class ProxyPvSumPowerSensor(BasePhSensor):
-    def __init__(self, hass, *, entry, key):
-        super().__init__(entry=entry, key=key)
-        self.hass = hass
-        self._attr_entity_registry_enabled_default = False
-        self._attr_entity_category = EntityCategory.DIAGNOSTIC
-
-    async def async_added_to_hass(self):
-        data = self._entry.options or self._entry.data
-        pv_sensors = data.get("pv_leistung") or []
-        if isinstance(pv_sensors, str):
-            pv_sensors = [pv_sensors]
-
-        async_track_state_change_event(self.hass, pv_sensors, self._update)
-        self._update()
-
-    @callback
-    def _update(self, event=None):
-        self._attr_native_value = sum_pv_power(self.hass, self._entry)
-        self.async_write_ha_state()
-
-class InvertedPowerSensor(BasePhSensor):
-    def __init__(self, hass, *, source_entity, entry, key):
-        super().__init__(entry=entry, key=key)
-        self.hass = hass
-        self._source = source_entity
-        self._attr_entity_registry_enabled_default = False
-
-    async def async_added_to_hass(self):
-        async_track_state_change_event(self.hass, [self._source], self._changed)
-        self._update()
-
-    @callback
-    def _changed(self, event):
-        self._update()
-
-    def _update(self):
-        value = power_in_watt(self.hass, self._entry, self._source)
-        self._attr_native_value = -value
-        self.async_write_ha_state()
-
-# =====================================================================
-# SPLIT / COMBINE
-# =====================================================================
-
-class SplitPowerSensor(BasePhSensor):
-    def __init__(self, hass, *, source_entity, entry, key, positive):
-        super().__init__(entry=entry, key=key)
-        self.hass = hass
-        self._source = source_entity
-        self._positive = positive
-
-    async def async_added_to_hass(self):
-        async_track_state_change_event(self.hass, [self._source], self._changed)
-        self._update()
-
-    @callback
-    def _changed(self, event):
-        self._update()
-
-    def _update(self):
-        value = power_in_watt(self.hass, self._entry, self._source)
-        self._attr_native_value = max(value, 0) if self._positive else max(-value, 0)
-        self.async_write_ha_state()
-
-
-class CombinedPowerSensor(BasePhSensor):
-    def __init__(self, hass, *, pos_entity, neg_entity, entry, key, ena_def):
-        super().__init__(entry=entry, key=key)
-        self.hass = hass
-        self._pos = pos_entity
-        self._neg = neg_entity
-        self._attr_entity_registry_enabled_default = ena_def
-
-    async def async_added_to_hass(self):
-        async_track_state_change_event(self.hass, [self._pos, self._neg], self._changed)
-        self._update()
-
-    @callback
-    def _changed(self, event):
-        self._update()
-
-    def _update(self):
-        pos = power_in_watt(self.hass, self._entry, self._pos)
-        neg = power_in_watt(self.hass, self._entry, self._neg)
-        self._attr_native_value = pos - neg
-        self.async_write_ha_state()
-
-
-# =====================================================================
-# FLOW SENSORS
-# =====================================================================
-
-class FlowPowerSensor(BasePhSensor):
-    def __init__(self, hass, entry, key, sources):
-        super().__init__(entry=entry, key=key)
-        self.hass = hass
-        self._key = key
-        self._sources = sources
-
-    async def async_added_to_hass(self):
-        async_track_state_change_event(
-            self.hass,
-            [e for e in self._sources.values() if e],
-            self._update,
-        )
-        self._update()
-
-    @callback
-    def _update(self, event=None):
-        def val(e):
-            return power_in_watt(self.hass, self._entry, e) if e else 0.0
-        cfg = self._entry.options or self._entry.data
-        akku_prio = cfg.get("akku_prio", False)
-        netz = val(self._sources["netz"])
-        pv = sum_pv_power(self.hass, self._entry)
-        akku = val(self._sources["akku"])
-        nb = val(self._sources["netz_bezug"])
-        ne = val(self._sources["netz_einspeisung"])
-        al = val(self._sources["akku_laden"])
-        ae = val(self._sources["akku_entladen"])
-
-        if netz != 0 and nb == 0 and ne == 0:
-            nb = max(netz, 0)
-            ne = max(-netz, 0)
-
-        if netz == 0 and (nb != 0 or ne != 0):
-            netz = nb - ne
-
-        if akku != 0 and al == 0 and ae == 0:
-            ae = max(akku, 0)
-            al = max(-akku, 0)
-
-        if akku == 0 and (al != 0 or ae != 0):
-            akku = ae - al
-
-        haus = netz + pv + akku
-
-        if akku_prio:
-            pv_zu_akku = max(min(pv, al),0)
-            pv_zu_haus = max(min(max(pv - pv_zu_akku, 0), haus),0)
-        else:
-            pv_zu_haus = max(min(pv, haus),0)
-            pv_zu_akku = max(min(max(pv - pv_zu_haus, 0), al),0)
-
-        pv_zu_netz = max(pv - pv_zu_haus - pv_zu_akku, 0)
-
-        akku_zu_haus = max(min(ae, haus - pv_zu_haus),0)
-        akku_zu_netz = max(ae - akku_zu_haus, 0)
-
-        netz_zu_haus = max(haus - pv_zu_haus - akku_zu_haus, 0)
-        netz_zu_akku = max(al - pv_zu_akku, 0)
-
-        mapping = {
-            "haus": haus,
-            "pv_zu_haus": pv_zu_haus,
-            "pv_zu_akku": pv_zu_akku,
-            "pv_zu_netz": pv_zu_netz,
-            "netz_zu_haus": netz_zu_haus,
-            "netz_zu_akku": netz_zu_akku,
-            "akku_zu_haus": akku_zu_haus,
-            "akku_zu_netz": akku_zu_netz,
-        }
-
-        self._attr_native_value = mapping.get(self._key, 0)
-        self.async_write_ha_state()
+    async def async_added_to_hass(self) -> None:
+        self.async_on_remove(self._hub.async_add_listener(self.async_write_ha_state))
