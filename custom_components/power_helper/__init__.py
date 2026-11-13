@@ -5,7 +5,10 @@ from types import MappingProxyType
 
 from homeassistant.config_entries import ConfigEntry, ConfigSubentry
 from homeassistant.core import HomeAssistant
+from homeassistant.helpers import config_validation as cv
+from homeassistant.helpers.typing import ConfigType
 
+from .card import async_register_card
 from .config_flow import battery_data
 from .const import (
     BATTERY_KEYS,
@@ -13,6 +16,7 @@ from .const import (
     CONF_BAT_DISCHARGE,
     CONF_BAT_POWER,
     CONF_PV_POWER,
+    DOMAIN,
     SUBENTRY_BATTERY,
     SUBENTRY_PV,
 )
@@ -23,7 +27,15 @@ _LOGGER = logging.getLogger(__name__)
 PLATFORMS = ["sensor"]
 CURRENT_VERSION = 3
 
+CONFIG_SCHEMA = cv.config_entry_only_config_schema(DOMAIN)
+
 type PowerHelperConfigEntry = ConfigEntry[PowerHelperHub]
+
+
+async def async_setup(hass: HomeAssistant, config: ConfigType) -> bool:
+    """Einmal pro Start: Leistungsfluss-Karte fürs Dashboard bereitstellen."""
+    await async_register_card(hass)
+    return True
 
 
 async def async_setup_entry(hass: HomeAssistant, entry: PowerHelperConfigEntry) -> bool:

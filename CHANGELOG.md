@@ -6,6 +6,16 @@
 
 ## English
 
+### 2.1.0
+
+#### ✨ New
+
+- 🗺️ **Dashboard card "powerHELPER Power Flow"** – styled after the energy dashboard, shows the current power of PV, grid, battery and home and **the power of each flow right next to its line**. Animated dots show the direction, a ring around the home shows where the power comes from.
+- 🔀 **Three layouts:** Classic (like the energy dashboard), Round (home in the center, connections as arcs) and Triangle (home in the center, straight connections).
+- 📐 **Same size as the original:** circles always 80 px, only the distances and lines adapt to the card width.
+- ⚙️ **Visual editor:** device selection, title prefilled with the device name, show "0 W" on lines and in the circles, optional links to the energy dashboard and to powerHELPER.
+- 🔌 The card is registered automatically – no dashboard resource needed. After updates, browsers load the new card version automatically.
+
 ### 2.0.0
 
 #### ⚠️ Important – please read before updating
@@ -46,6 +56,16 @@
 ---
 
 ## Deutsch
+
+### 2.1.0
+
+#### ✨ Neu
+
+- 🗺️ **Dashboard-Karte „powerHELPER Leistungsfluss“** – angelehnt an das Energie-Dashboard, zeigt die aktuellen Leistungen von PV, Netz, Akku und Haus und **die Leistung jedes Flusses direkt an der Linie**. Animierte Punkte zeigen die Richtung, ein Ring ums Haus zeigt, woher die Leistung kommt.
+- 🔀 **Drei Darstellungen:** Klassisch (wie das Energie-Dashboard), Rund (Haus in der Mitte, Verbindungen als Bögen) und Dreieck (Haus in der Mitte, gerade Verbindungen).
+- 📐 **Gleiche Größe wie das Original:** Kreise immer 80 px, nur Abstände und Linien passen sich der Kartenbreite an.
+- ⚙️ **Visueller Editor:** Geräteauswahl, Titel mit dem Gerätenamen vorausgefüllt, „0 W“ an Linien und in den Kreisen anzeigen, optionale Links zum Energie-Dashboard und zu powerHELPER.
+- 🔌 Die Karte wird automatisch registriert – keine Dashboard-Ressource nötig. Nach Updates laden Browser die neue Kartenversion automatisch.
 
 ### 2.0.0
 

@@ -26,6 +26,7 @@ Dies ist mein erstes GitHub-Projekt und die Custom Integration wurde mithilfe vo
 - 🔌 Aufteilung von Leistungsflüssen (PV, Netz, Akku, Haus)
 - 🔋 Akku-Leistung kann invertiert werden
 - ➕ Mehrere PV-Anlagen und Akkus können hinzugefügt werden
+- 🗺️ Dashboard-Karte für die Leistungsflüsse in drei Darstellungen
 - ⚙️ Einfache Einrichtung und Bearbeitung über die UI
 - 📊 Ausgabe in **Watt (W)**
 - 🔄 Unterstützt Sensoren in **W** und **kW**
@@ -78,6 +79,8 @@ powerHELPER legt ein **Hauptgerät** an und darunter **je PV-Anlage und je Akku 
 Weitere PV-Anlagen und Akkus fügst du auf der Integrationsseite über **PV-Anlage hinzufügen** bzw. **Akku hinzufügen** hinzu; bearbeiten und löschen geht über das Menü der jeweiligen Anlage.
 
 Die Entity-IDs entstehen aus Gerätename und Sensorname (z. B. `<gerät>` = `powerhelper`).
+
+<p align="center"><img src="docs/images/flows-de.png" alt="Mögliche Leistungsflüsse zwischen PV, Netz, Akku und Haus" width="560"></p>
 
 ### 🏠 Hauptgerät powerHELPER
 
@@ -136,6 +139,40 @@ Alle Sensoren liefern **Watt (W)** und sind Dashboard-fähig.
 
 ---
 
+## 🗺️ Dashboard-Karte „powerHELPER Leistungsfluss“
+
+powerHELPER bringt eine eigene Karte mit, die sich am Energie-Dashboard orientiert. Sie zeigt die aktuellen Leistungen von PV, Netz, Akku und Haus und **die Leistung jedes Flusses direkt an der Linie**.
+
+| Klassisch | Rund | Dreieck |
+|:---:|:---:|:---:|
+| ![Klassisch](docs/images/card-classic-de.gif) | ![Rund](docs/images/card-round-de.gif) | ![Dreieck](docs/images/card-triangle-de.gif) |
+
+**Hinzufügen:** Dashboard bearbeiten → **Karte hinzufügen** → **powerHELPER Leistungsfluss** → Gerät auswählen.
+
+| Option | Beschreibung |
+|---|---|
+| Gerät | Hauptgerät von powerHELPER |
+| Titel | Überschrift, beim Hinzufügen mit dem Gerätenamen vorausgefüllt |
+| Darstellung | **Klassisch**, **Rund** oder **Dreieck** |
+| 0 W an Linien anzeigen | zeigt „0 W“ auch an Linien ohne Leistungsfluss (Standard: aus) |
+| 0 W in Kreisen anzeigen | zeigt bei Netz und Akku auch Zeilen mit 0 W (Standard: an) |
+| Link zum Energie-Dashboard | Link „Energie-Dashboard aufrufen“ in der Fußzeile (Standard: an) |
+| Link zum powerHELPER | Link „powerHELPER aufrufen“ zur Integrationsseite (Standard: aus) |
+
+```yaml
+type: custom:power-helper-card
+device_id: <id des powerHELPER-Geräts>
+layout: classic # classic | round | triangle
+show_zero_flows: false
+show_zero_node_values: true
+link_energy_dashboard: true
+link_power_helper: false
+```
+
+Ein Klick auf einen Kreis öffnet den zugehörigen Sensor.
+
+---
+
 ## ❓ FAQ
 
 ### Benötige ich AC oder DC Sensoren?
@@ -148,7 +185,7 @@ DC-Sensoren, wie sie beispielsweise von Wechselrichtern direkt aus der PV-Anlage
 
 ## 🧪 Status
 
-Version: **2.0.0**
+Version: **2.1.0**
 
 Getestet mit PV + Akku Systemen
 

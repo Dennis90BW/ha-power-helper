@@ -26,6 +26,7 @@ This is my first GitHub project, and the custom integration was created with the
 - 🔌 Power flow breakdown (PV, grid, battery, home)
 - 🔋 Battery power can be inverted
 - ➕ Multiple PV systems and batteries can be added
+- 🗺️ Dashboard card for the power flows in three layouts
 - ⚙️ Easy setup and editing via the UI
 - 📊 Output in **watts (W)**
 - 🔄 Supports sensors in **W** and **kW**
@@ -78,6 +79,8 @@ powerHELPER creates a **main device** and below it **one device per PV system an
 Add further PV systems and batteries on the integration page via **Add PV system** or **Add battery**; edit and delete them via the menu of each system.
 
 Entity IDs are built from the device name and the sensor name (e.g. `<device>` = `powerhelper`).
+
+<p align="center"><img src="docs/images/flows-en.png" alt="Possible power flows between PV, grid, battery and home" width="560"></p>
 
 ### 🏠 Main device powerHELPER
 
@@ -136,6 +139,40 @@ All sensors provide **watts (W)** and are fully dashboard-ready.
 
 ---
 
+## 🗺️ Dashboard card "powerHELPER Power Flow"
+
+powerHELPER ships its own card, styled after the energy dashboard. It shows the current power of PV, grid, battery and home and **the power of each flow right next to its line**.
+
+| Classic | Round | Triangle |
+|:---:|:---:|:---:|
+| ![Classic](docs/images/card-classic-en.gif) | ![Round](docs/images/card-round-en.gif) | ![Triangle](docs/images/card-triangle-en.gif) |
+
+**Add it:** Edit dashboard → **Add card** → **powerHELPER Power Flow** → select the device.
+
+| Option | Description |
+|---|---|
+| Device | powerHELPER main device |
+| Title | heading, prefilled with the device name when adding the card |
+| Layout | **Classic**, **Round** or **Triangle** |
+| Show 0 W on lines | also shows "0 W" on lines without power flow (default: off) |
+| Show 0 W in circles | also shows rows with 0 W in the grid and battery circles (default: on) |
+| Link to the energy dashboard | "Go to the energy dashboard" link in the footer (default: on) |
+| Link to powerHELPER | "Go to powerHELPER" link to the integration page (default: off) |
+
+```yaml
+type: custom:power-helper-card
+device_id: <id of the powerHELPER device>
+layout: classic # classic | round | triangle
+show_zero_flows: false
+show_zero_node_values: true
+link_energy_dashboard: true
+link_power_helper: false
+```
+
+Clicking a circle opens the related sensor.
+
+---
+
 ## ❓ FAQ
 
 ### Do I need AC or DC sensors?
@@ -148,7 +185,7 @@ DC sensors, such as those coming directly from inverters in the PV system or cer
 
 ## 🧪 Status
 
-Version: **2.0.0**
+Version: **2.1.0**
 
 Tested with PV + battery systems
 
