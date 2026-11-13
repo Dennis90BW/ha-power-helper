@@ -80,7 +80,15 @@ Weitere PV-Anlagen und Akkus fügst du auf der Integrationsseite über **PV-Anla
 
 Die Entity-IDs entstehen aus Gerätename und Sensorname (z. B. `<gerät>` = `powerhelper`).
 
+### ⚖️ Leistungsflüsse und Bilanz
+
+powerHELPER bilanziert die Leistungen von PV, Netz, Akku und Haus und teilt sie auf die möglichen Leistungsflüsse auf. Für jeden Fluss im Bild gibt es einen eigenen Sensor; zwischen Netz und Akku sind beide Richtungen möglich.
+
 <p align="center"><img src="docs/images/flows-de.png" alt="Mögliche Leistungsflüsse zwischen PV, Netz, Akku und Haus" width="560"></p>
+
+**Bilanz:** Haus Leistung = PV Leistung + Netzbezug − Netzeinspeisung + Akku entladen − Akku laden
+
+**Aufteilung:** PV versorgt zuerst das Haus, lädt danach die Akkus und speist den Rest ins Netz ein. Akkus mit Priorität (z. B. DC-gekoppelt) bekommen PV-Leistung schon vor dem Haus. Was PV und Akku nicht decken, kommt aus dem Netz.
 
 ### 🏠 Hauptgerät powerHELPER
 

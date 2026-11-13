@@ -80,7 +80,15 @@ Add further PV systems and batteries on the integration page via **Add PV system
 
 Entity IDs are built from the device name and the sensor name (e.g. `<device>` = `powerhelper`).
 
+### ⚖️ Power flows and balance
+
+powerHELPER balances the power of PV, grid, battery and home and splits it into the possible power flows. There is a separate sensor for every flow in the picture; between grid and battery both directions are possible.
+
 <p align="center"><img src="docs/images/flows-en.png" alt="Possible power flows between PV, grid, battery and home" width="560"></p>
+
+**Balance:** Home Power = PV Power + Grid Consumption − Grid Feed-in + Battery Discharging − Battery Charging
+
+**Distribution:** PV supplies the home first, then charges the batteries and feeds the rest into the grid. Batteries with priority (e.g. DC-coupled) get PV power even before the home. Whatever PV and battery cannot cover comes from the grid.
 
 ### 🏠 Main device powerHELPER
 
