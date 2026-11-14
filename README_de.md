@@ -26,9 +26,10 @@ Dies ist mein erstes GitHub-Projekt und die Custom Integration wurde mithilfe vo
 - 🔌 Aufteilung von Leistungsflüssen (PV, Netz, Akku, Haus)
 - 🔋 Akku-Leistung kann invertiert werden
 - ➕ Mehrere PV-Anlagen und Akkus können hinzugefügt werden
+- 📈 PV-Eigenverbrauch und Autarkiegrad als Kennzahlen (optional)
 - 🗺️ Dashboard-Karte für die Leistungsflüsse in drei Darstellungen
 - ⚙️ Einfache Einrichtung und Bearbeitung über die UI
-- 📊 Ausgabe in **Watt (W)**
+- 📊 Leistungen in **Watt (W)**, Kennzahlen in **Prozent (%)**
 - 🔄 Unterstützt Sensoren in **W** und **kW**
 - 🌍 Mehrsprachig (DE / EN)
 
@@ -80,6 +81,8 @@ Weitere PV-Anlagen und Akkus fügst du auf der Integrationsseite über **PV-Anla
 
 Die Entity-IDs entstehen aus Gerätename und Sensorname (z. B. `<gerät>` = `powerhelper`).
 
+Sensoren, die nur einen deiner Quellsensoren wiederholen, werden als Diagnose-Sensoren angelegt und sind deaktiviert. Ebenfalls deaktiviert sind die invertierten Akku-Sensoren und die Kennzahlen. Bei Bedarf aktivierst du sie in den Entitäts-Einstellungen.
+
 ### ⚖️ Leistungsflüsse und Bilanz
 
 powerHELPER bilanziert die Leistungen von PV, Netz, Akku und Haus und teilt sie auf die möglichen Leistungsflüsse auf. Für jeden Fluss im Bild gibt es einen eigenen Sensor; zwischen Netz und Akku sind beide Richtungen möglich.
@@ -130,6 +133,12 @@ Mehrere Akkus werden zuerst miteinander verrechnet: Lädt ein Akku, während ein
 |---|---|
 | `sensor.<gerät>_haus_leistung` | Haus Leistung |
 
+#### 📊 Kennzahlen
+| Entität | Name |
+|---|---|
+| `sensor.<gerät>_pv_eigenverbrauch` | PV-Eigenverbrauch |
+| `sensor.<gerät>_autarkiegrad` | Autarkiegrad |
+
 ### ☀️ Verbundenes Gerät je PV-Anlage
 | Entität | Name |
 |---|---|
@@ -143,7 +152,7 @@ Mehrere Akkus werden zuerst miteinander verrechnet: Lädt ein Akku, während ein
 | `sensor.<akku>_laden` | Laden |
 | `sensor.<akku>_entladen` | Entladen |
 
-Alle Sensoren liefern **Watt (W)** und sind Dashboard-fähig.
+Alle Leistungssensoren liefern **Watt (W)**, die Kennzahlen **Prozent (%)**; alle sind Dashboard-fähig.
 
 ---
 
@@ -162,8 +171,12 @@ powerHELPER bringt eine eigene Karte mit, die sich am Energie-Dashboard orientie
 | Gerät | Hauptgerät von powerHELPER |
 | Titel | Überschrift, beim Hinzufügen mit dem Gerätenamen vorausgefüllt |
 | Darstellung | **Klassisch**, **Rund** oder **Dreieck** |
+| Akku-Ladestand | zeigt den Ladestand über dem Akku-Icon (optional) |
 | 0 W an Linien anzeigen | zeigt „0 W“ auch an Linien ohne Leistungsfluss (Standard: aus) |
 | 0 W in Kreisen anzeigen | zeigt bei Netz und Akku auch Zeilen mit 0 W (Standard: an) |
+| Eigenverbrauch und Autarkiegrad anzeigen | zwei Ringe oben rechts: außen grün der **PV-Eigenverbrauch**, innen gelb der **Autarkiegrad** (Standard: aus) |
+| Bezeichnungen | eigene Namen für PV, Netz, Akku, Haus, Eigenverbrauch und Autarkiegrad; *leer* = Standardname, `-` = ausblenden |
+| Linien anklickbar | ein Klick auf eine Linie öffnet den zugehörigen Fluss-Sensor (Standard: an) |
 | Link zum Energie-Dashboard | Link „Energie-Dashboard aufrufen“ in der Fußzeile (Standard: an) |
 | Link zum powerHELPER | Link „powerHELPER aufrufen“ zur Integrationsseite (Standard: aus) |
 
@@ -171,13 +184,18 @@ powerHELPER bringt eine eigene Karte mit, die sich am Energie-Dashboard orientie
 type: custom:power-helper-card
 device_id: <id des powerHELPER-Geräts>
 layout: classic # classic | round | triangle
+battery_soc_entity: sensor.akku_ladestand # optional
 show_zero_flows: false
 show_zero_node_values: true
+show_ratios: false
+clickable_lines: true
 link_energy_dashboard: true
 link_power_helper: false
+name_pv: Balkonkraftwerk
+name_autarky: "-" # "-" blendet einen Namen aus
 ```
 
-Ein Klick auf einen Kreis öffnet den zugehörigen Sensor.
+Ein Klick auf einen Kreis öffnet den zugehörigen Sensor, ein Klick auf eine Linie den Sensor des Leistungsflusses. Ein Klick auf einen Ring öffnet den Kennzahl-Sensor – ist er deaktiviert, kannst du ihn dort als Administrator direkt aktivieren.
 
 ---
 
@@ -193,7 +211,7 @@ DC-Sensoren, wie sie beispielsweise von Wechselrichtern direkt aus der PV-Anlage
 
 ## 🧪 Status
 
-Version: **2.1.0**
+Version: **2.1.1**
 
 Getestet mit PV + Akku Systemen
 

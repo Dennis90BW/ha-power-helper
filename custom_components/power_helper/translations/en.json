@@ -242,6 +242,12 @@
       },
       "bat_entladen": {
         "name": "Discharging"
+      },
+      "pv_eigenverbrauch": {
+        "name": "Self-consumption"
+      },
+      "autarkiegrad": {
+        "name": "Self-sufficiency"
       }
     }
   }

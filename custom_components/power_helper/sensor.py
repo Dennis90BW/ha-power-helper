@@ -7,7 +7,7 @@ from homeassistant.components.sensor import (
     SensorEntity,
     SensorStateClass,
 )
-from homeassistant.const import UnitOfPower
+from homeassistant.const import PERCENTAGE, UnitOfPower
 from homeassistant.core import HomeAssistant
 from homeassistant.helpers import device_registry as dr
 from homeassistant.helpers import entity_registry as er
@@ -26,6 +26,7 @@ class SensorSpec:
     translation_key: str
     enabled: bool = True
     diagnostic: bool = False
+    ratio: bool = False  # Anteil in % statt Leistung in W
 
 
 # =====================================================================
@@ -87,8 +88,15 @@ async def async_setup_entry(hass: HomeAssistant, entry, async_add_entities):
             SensorSpec("akku_zu_netz", "akku_zu_netz"),
         ]
 
+    # ==================== KENNZAHLEN (standardmäßig deaktiviert) ====================
+    # Wer einen Verlauf möchte, aktiviert sie; die Karte rechnet auch ohne sie.
+    if hub.pv:
+        specs.append(SensorSpec("pv_eigenverbrauch", "pv_eigenverbrauch", enabled=False, ratio=True))
+    if hub.pv or has_bat:
+        specs.append(SensorSpec("autarkiegrad", "autarkiegrad", enabled=False, ratio=True))
+
     main_entities = [
-        PowerHelperSensor(
+        (PowerHelperRatioSensor if spec.ratio else PowerHelperSensor)(
             hub,
             spec,
             unique_id=f"{DOMAIN}_{entry.entry_id}_{spec.key}",
@@ -191,8 +199,31 @@ class PowerHelperSensor(SensorEntity):
             self._attr_entity_category = EntityCategory.DIAGNOSTIC
 
     @property
-    def native_value(self) -> float:
+    def native_value(self) -> float | None:
         return self._hub.values.get(self._key, 0.0)
 
     async def async_added_to_hass(self) -> None:
         self.async_on_remove(self._hub.async_add_listener(self.async_write_ha_state))
+
+
+class PowerHelperRatioSensor(PowerHelperSensor):
+    """PV-Eigenverbrauch bzw. Autarkiegrad in %.
+
+    Standardmäßig deaktiviert – wer einen Verlauf möchte, aktiviert den Sensor
+    (die Karte öffnet ihn auch deaktiviert per Klick auf den Ring).
+    Unbekannt, solange es keine PV-Leistung bzw. keinen Hausverbrauch gibt.
+    """
+
+    _attr_device_class = None
+    _attr_native_unit_of_measurement = PERCENTAGE
+    _attr_suggested_display_precision = 0
+
+    def __init__(self, hub: PowerHelperHub, spec: SensorSpec, **kwargs) -> None:
+        super().__init__(hub, spec, **kwargs)
+        self._attr_icon = (
+            "mdi:solar-power-variant" if spec.key == "pv_eigenverbrauch" else "mdi:home-lightning-bolt"
+        )
+
+    @property
+    def native_value(self) -> float | None:
+        return self._hub.values.get(self._key)

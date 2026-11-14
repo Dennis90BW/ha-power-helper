@@ -26,9 +26,10 @@ This is my first GitHub project, and the custom integration was created with the
 - 🔌 Power flow breakdown (PV, grid, battery, home)
 - 🔋 Battery power can be inverted
 - ➕ Multiple PV systems and batteries can be added
+- 📈 Self-consumption and self-sufficiency as ratios (optional)
 - 🗺️ Dashboard card for the power flows in three layouts
 - ⚙️ Easy setup and editing via the UI
-- 📊 Output in **watts (W)**
+- 📊 Power in **watts (W)**, ratios in **percent (%)**
 - 🔄 Supports sensors in **W** and **kW**
 - 🌍 Multilingual (DE / EN)
 
@@ -80,6 +81,8 @@ Add further PV systems and batteries on the integration page via **Add PV system
 
 Entity IDs are built from the device name and the sensor name (e.g. `<device>` = `powerhelper`).
 
+Sensors that only repeat one of your source sensors are created as diagnostic sensors and are disabled. The inverted battery sensors and the ratios are disabled as well. Enable them in the entity settings if you need them.
+
 ### ⚖️ Power flows and balance
 
 powerHELPER balances the power of PV, grid, battery and home and splits it into the possible power flows. There is a separate sensor for every flow in the picture; between grid and battery both directions are possible.
@@ -130,6 +133,12 @@ Multiple batteries are netted against each other first: if one battery charges w
 |---|---|
 | `sensor.<device>_home_power` | Home Power |
 
+#### 📊 Ratios
+| Entity | Name |
+|---|---|
+| `sensor.<device>_self_consumption` | Self-consumption |
+| `sensor.<device>_self_sufficiency` | Self-sufficiency |
+
 ### ☀️ Connected device per PV system
 | Entity | Name |
 |---|---|
@@ -143,7 +152,7 @@ Multiple batteries are netted against each other first: if one battery charges w
 | `sensor.<battery>_charging` | Charging |
 | `sensor.<battery>_discharging` | Discharging |
 
-All sensors provide **watts (W)** and are fully dashboard-ready.
+All power sensors provide **watts (W)**, the ratios **percent (%)**; all are dashboard-ready.
 
 ---
 
@@ -162,8 +171,12 @@ powerHELPER ships its own card, styled after the energy dashboard. It shows the 
 | Device | powerHELPER main device |
 | Title | heading, prefilled with the device name when adding the card |
 | Layout | **Classic**, **Round** or **Triangle** |
+| Battery state of charge | shows the state of charge above the battery icon (optional) |
 | Show 0 W on lines | also shows "0 W" on lines without power flow (default: off) |
 | Show 0 W in circles | also shows rows with 0 W in the grid and battery circles (default: on) |
+| Show self-consumption and self-sufficiency | two rings in the top right: outer green **self-consumption**, inner yellow **self-sufficiency** (default: off) |
+| Names | custom names for PV, grid, battery, home, self-consumption and self-sufficiency; *empty* = default name, `-` = hide |
+| Clickable lines | clicking a line opens the related power flow sensor (default: on) |
 | Link to the energy dashboard | "Go to the energy dashboard" link in the footer (default: on) |
 | Link to powerHELPER | "Go to powerHELPER" link to the integration page (default: off) |
 
@@ -171,13 +184,18 @@ powerHELPER ships its own card, styled after the energy dashboard. It shows the 
 type: custom:power-helper-card
 device_id: <id of the powerHELPER device>
 layout: classic # classic | round | triangle
+battery_soc_entity: sensor.battery_soc # optional
 show_zero_flows: false
 show_zero_node_values: true
+show_ratios: false
+clickable_lines: true
 link_energy_dashboard: true
 link_power_helper: false
+name_pv: Balcony power plant
+name_autarky: "-" # "-" hides a name
 ```
 
-Clicking a circle opens the related sensor.
+Clicking a circle opens the related sensor, clicking a line opens the sensor of that power flow. Clicking a ring opens the ratio sensor – if it is disabled, administrators can enable it right there.
 
 ---
 
@@ -193,7 +211,7 @@ DC sensors, such as those coming directly from inverters in the PV system or cer
 
 ## 🧪 Status
 
-Version: **2.1.0**
+Version: **2.1.1**
 
 Tested with PV + battery systems
 

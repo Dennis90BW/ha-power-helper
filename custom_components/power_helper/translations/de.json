@@ -242,6 +242,12 @@
       },
       "bat_entladen": {
         "name": "Entladen"
+      },
+      "pv_eigenverbrauch": {
+        "name": "PV-Eigenverbrauch"
+      },
+      "autarkiegrad": {
+        "name": "Autarkiegrad"
       }
     }
   }

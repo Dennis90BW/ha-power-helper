@@ -6,6 +6,23 @@
 
 ## English
 
+### 2.1.1
+
+#### ✨ Card improvements
+
+- 🔋 **Battery state of charge:** optional SOC sensor in the card settings. The battery icon follows the charge level in four steps (high, medium, low and empty below 10 %), the SOC is shown above the icon.
+- 🏷️ **Custom names** for the four circles and the two ratios – leave empty for the default name, enter `-` to hide a name.
+- 🟢 **Self-consumption and self-sufficiency (optional):** two rings in the top right of the card – outer green: share of PV power used in the home or battery, inner yellow: self-sufficiency like the energy dashboard (1 − grid import ÷ home consumption; charging the battery from the grid counts as grid import).
+- ⚙️ **Card settings grouped like the Home Assistant cards:** Content, Names, Interactions.
+- 👆 **Clickable lines (optional, on by default):** clicking a line opens the sensor of that power flow.
+- 📐 Triangle layout: the grid ↔ battery value now sits just below its line.
+- 🔗 Footer links now use the Home Assistant button, just like the energy distribution card.
+
+#### ✨ New
+
+- 📊 **New sensors "Self-consumption" and "Self-sufficiency"** (in %) on the main device – disabled by default, enable them if you want a history. Clicking a ring in the card opens its sensor.
+- 🎨 **New logo** following the Home Assistant brand guidelines, shipped with the integration.
+
 ### 2.1.0
 
 #### ✨ New
@@ -56,6 +73,23 @@
 ---
 
 ## Deutsch
+
+### 2.1.1
+
+#### ✨ Verbesserungen der Karte
+
+- 🔋 **Akku-Ladestand:** optionaler SOC-Sensor in den Karteneinstellungen. Das Akku-Icon passt sich dem Ladestand in vier Stufen an (hoch, mittel, niedrig und leer unter 10 %), der Ladestand steht über dem Icon.
+- 🏷️ **Eigene Bezeichnungen** für die vier Kreise und die beiden Kennzahlen – leer lassen für den Standardnamen, `-` blendet einen Namen aus.
+- 🟢 **Eigenverbrauch und Autarkiegrad (optional):** zwei Ringe oben rechts in der Karte – außen grün: Anteil der PV-Leistung, der im Haus oder Akku bleibt, innen gelb: Autarkiegrad wie im Energie-Dashboard (1 − Netzbezug ÷ Hausverbrauch; Laden des Akkus aus dem Netz zählt als Netzbezug).
+- ⚙️ **Karteneinstellungen gruppiert wie bei den Home-Assistant-Karten:** Inhalt, Bezeichnungen, Interaktionen.
+- 👆 **Anklickbare Linien (optional, standardmäßig an):** Ein Klick auf eine Linie öffnet den Sensor des Leistungsflusses.
+- 📐 Dreieck: Die Leistung Netz ↔ Akku steht jetzt knapp unter ihrer Linie.
+- 🔗 Die Links in der Fußzeile nutzen jetzt den Home-Assistant-Button – wie bei der Energieverteilung.
+
+#### ✨ Neu
+
+- 📊 **Neue Sensoren „PV-Eigenverbrauch“ und „Autarkiegrad“** (in %) am Hauptgerät – standardmäßig deaktiviert, wer einen Verlauf möchte, aktiviert sie. Ein Klick auf einen Ring in der Karte öffnet den Sensor.
+- 🎨 **Neues Logo** nach den Home-Assistant-Vorgaben, direkt in der Integration enthalten.
 
 ### 2.1.0
 

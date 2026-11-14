@@ -10,7 +10,7 @@ from homeassistant.core import Event, HomeAssistant, callback
 from homeassistant.helpers.event import async_track_state_change_event
 from homeassistant.util.unit_conversion import PowerConverter
 
-from .calc import BatteryFlow, compute_flows
+from .calc import BatteryFlow, compute_flows, compute_ratios
 from .const import (
     CONF_BAT_CHARGE,
     CONF_BAT_DISCHARGE,
@@ -156,7 +156,7 @@ class PowerHelperHub:
 
     def update(self) -> None:
         w = lambda eid, inv=False: power_in_watt(self.hass, eid, inv)  # noqa: E731
-        values: dict[str, float] = {}
+        values: dict[str, float | None] = {}
 
         # Netz
         if self.grid_is_split:
@@ -192,5 +192,7 @@ class PowerHelperHub:
 
         # Bilanz (Akkus werden darin zuerst miteinander verrechnet)
         values.update(compute_flows(netz=netz, pv=pv, batteries=flows))
+        # PV-Eigenverbrauch und Autarkiegrad in % (None = nicht aussagekräftig)
+        values.update(compute_ratios(values, pv))
         # -0.0 (z. B. aus max(-0.0, 0.0) oder -0) als 0.0 ausgeben, sonst zeigt HA "-0.0"
-        self.values = {k: (v if v != 0 else 0.0) for k, v in values.items()}
+        self.values = {k: (v if v is None or v != 0 else 0.0) for k, v in values.items()}

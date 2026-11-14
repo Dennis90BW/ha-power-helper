@@ -28,15 +28,33 @@
       no_entities: "Für dieses Gerät wurden keine powerHELPER-Sensoren gefunden.",
       link_energy: "Energie-Dashboard aufrufen",
       link_power_helper: "powerHELPER aufrufen",
+      self_consumption: "PV-Eigenverbrauch",
+      autarky: "Autarkiegrad",
       editor: {
         device_id: "powerHELPER-Gerät",
         title: "Titel (optional)",
         layout: "Darstellung",
         show_zero_flows: "0 W an Linien anzeigen",
         show_zero_node_values: "0 W in Kreisen anzeigen",
+        show_ratios: "Eigenverbrauch und Autarkiegrad anzeigen",
+        clickable_lines: "Linien anklickbar",
         link_energy_dashboard: "Link zum Energie-Dashboard",
         link_power_helper: "Link zum powerHELPER",
         links: "Links",
+        battery_soc_entity: "Akku-Ladestand (optional)",
+        content: "Inhalt",
+        names: "Bezeichnungen",
+        interactions: "Interaktionen",
+        name_pv: "Name PV",
+        name_grid: "Name Netz",
+        name_battery: "Name Akku",
+        name_home: "Name Haus",
+        name_self_consumption: "Name Eigenverbrauch",
+        name_autarky: "Name Autarkiegrad",
+      },
+      helper: {
+        battery_soc_entity: "Zeigt den Ladestand am Akku",
+        name: "Leer = Standard, - = ausblenden",
       },
       layouts: { classic: "Klassisch", round: "Rund", triangle: "Dreieck" },
     },
@@ -51,15 +69,33 @@
       no_entities: "No powerHELPER sensors were found for this device.",
       link_energy: "Go to the energy dashboard",
       link_power_helper: "Go to powerHELPER",
+      self_consumption: "Self-consumption",
+      autarky: "Self-sufficiency",
       editor: {
         device_id: "powerHELPER device",
         title: "Title (optional)",
         layout: "Layout",
         show_zero_flows: "Show 0 W on lines",
         show_zero_node_values: "Show 0 W in circles",
+        show_ratios: "Show self-consumption and self-sufficiency",
+        clickable_lines: "Clickable lines",
         link_energy_dashboard: "Link to the energy dashboard",
         link_power_helper: "Link to powerHELPER",
         links: "Links",
+        battery_soc_entity: "Battery state of charge (optional)",
+        content: "Content",
+        names: "Names",
+        interactions: "Interactions",
+        name_pv: "PV name",
+        name_grid: "Grid name",
+        name_battery: "Battery name",
+        name_home: "Home name",
+        name_self_consumption: "Self-consumption name",
+        name_autarky: "Self-sufficiency name",
+      },
+      helper: {
+        battery_soc_entity: "Shows the charge level at the battery",
+        name: "Empty = default, - = hide",
       },
       layouts: { classic: "Classic", round: "Round", triangle: "Triangle" },
     },
@@ -100,6 +136,124 @@
     home: "mdi:home",
   };
 
+  /**
+   * Akku-Icon passend zum Ladestand: high (ab 67 %), medium (34–66 %), low (10–33 %),
+   * outline (leer, unter 10 %). Grenzen passend zum gerundet angezeigten Wert.
+   * Ohne SOC das Standard-Icon.
+   */
+  function batteryIcon(soc) {
+    if (soc == null || !isFinite(soc)) return ICONS.battery;
+    const level = soc >= 66.5 ? "high" : soc >= 33.5 ? "medium" : soc >= 9.5 ? "low" : "outline";
+    return `mdi:battery-${level}`;
+  }
+
+  /** Prozentwert (0–100) im Zahlenformat der Sprache, z. B. "78 %" bzw. "78%" */
+  function formatPercent(pct, locale) {
+    if (pct == null || !isFinite(pct)) return "";
+    return new Intl.NumberFormat(locale, { style: "percent", maximumFractionDigits: 0 }).format(
+      Math.min(100, Math.max(0, pct)) / 100
+    );
+  }
+  const formatSoc = formatPercent;
+
+  /**
+   * Autarkiegrad in % wie im Energie-Dashboard: 1 − Netzbezug / Hausverbrauch.
+   * Zum Netzbezug zählt auch das Laden des Akkus aus dem Netz. Ohne Hausverbrauch: null.
+   */
+  function autarky(values) {
+    const home = values.nodes.home;
+    if (!(home > ACTIVE_THRESHOLD)) return null;
+    const fromGrid = values.flows.grid_home + values.flows.grid_bat;
+    return Math.min(100, Math.max(0, (1 - fromGrid / home) * 100));
+  }
+
+  /**
+   * PV-Eigenverbrauch in %: Anteil der PV-Leistung, der im Haus oder Akku bleibt
+   * (= (PV zu Haus + PV zu Akku) / PV). Ohne PV-Leistung: null.
+   */
+  function selfConsumption(values) {
+    const pv = values.nodes.pv;
+    if (!(pv > ACTIVE_THRESHOLD)) return null;
+    return Math.min(100, Math.max(0, ((values.flows.pv_home + values.flows.pv_bat) / pv) * 100));
+  }
+
+  // Kennzahlen-Ringe oben rechts: außen grün (PV-Eigenverbrauch), innen gelb (Autarkie)
+  const RATIO_COLORS = {
+    self_consumption: "var(--ph-self-consumption-color, #43a047)",
+    autarky: "var(--ph-autarky-color, #fbc02d)",
+  };
+  /**
+   * Lage der Kennzahlen-Ringe und der Legende. Die Legende steht rechtsbündig links
+   * neben den Ringen; legendMax ist der Platz bis zum PV-Kreis. Längere Namen werden
+   * mit ".." gekürzt (siehe truncateText), ausgeblendet wird nur mit "-".
+   */
+  function ratioLayout(L, legendTexts = []) {
+    const outer = 32;
+    const legendX = L.w - 2 * outer - 18;
+    const pvRight = L.nodes.pv[0] + L.radius.pv + 6;
+    return {
+      cx: L.w - outer - 6,
+      cy: outer + 6,
+      outer,
+      inner: outer - 7,
+      legend: legendTexts.some(Boolean),
+      legendX,
+      legendMax: Math.max(0, legendX - pvRight),
+    };
+  }
+
+  const ELLIPSIS = "..";
+
+  /**
+   * Text auf maxWidth kürzen und ".." anhängen. measure(text) liefert die Breite –
+   * im Browser die echte Textbreite, sonst eine Schätzung. Passt nicht einmal ein
+   * Zeichen plus "..", ist das Ergebnis leer.
+   */
+  function truncateText(text, maxWidth, measure = textWidth) {
+    const full = String(text || "");
+    if (!full || measure(full) <= maxWidth) return full;
+    for (let n = full.length - 1; n >= 1; n--) {
+      const short = full.slice(0, n).trimEnd() + ELLIPSIS;
+      if (measure(short) <= maxWidth) return short;
+    }
+    return "";
+  }
+
+  /** Sensor-Schlüssel einer Linie für den Klick (Netz ↔ Akku: aktuelle Richtung) */
+  function lineSensorKey(id, reverse) {
+    if (id === "grid_bat") return reverse ? FLOW_KEYS.bat_grid : FLOW_KEYS.grid_bat;
+    return FLOW_KEYS[id];
+  }
+
+  /** Eingabe in einem Bezeichnungsfeld, die den Namen ausblendet */
+  const HIDE_NAME = "-";
+
+  function customName(config, key) {
+    return String((config && config[`name_${key}`]) || "").trim();
+  }
+
+  /**
+   * Bezeichnung für Kreise (pv, grid, battery, home) und Kennzahlen
+   * (self_consumption, autarky): leer = Standardname, "-" = ausgeblendet ("").
+   */
+  function nodeName(config, key, t) {
+    const custom = customName(config, key);
+    if (custom === HIDE_NAME) return "";
+    return custom || t[key];
+  }
+
+  /** Position des Namens; das Haus in Rund/Dreieck bekommt nur mit eigenem Namen einen (unten) */
+  function namePosition(L, node, config) {
+    const custom = customName(config, node);
+    if (custom === HIDE_NAME) return null;
+    const pos = L.names[node];
+    if (pos) return pos;
+    return custom ? "below" : null;
+  }
+
+  /** Geschätzte Textbreite bei 11 px (für die Platzprüfung der Legende) */
+  const textWidth = (text) => String(text || "").length * 5.9;
+
   // ---------------------------------------------------------------------------
   // Werte
   // ---------------------------------------------------------------------------
@@ -121,6 +275,9 @@
     grid: ["netz_leistung", "netz_bezug", "netz_zu_haus"],
     battery: ["akku_leistung", "akku_laden", "akku_zu_haus"],
     home: ["haus"],
+    // Kennzahlen-Ringe (versteckte Sensoren der Integration)
+    self_consumption: ["pv_eigenverbrauch"],
+    autarky: ["autarkiegrad"],
   };
 
   /** Knotenwerte aus den Flüssen berechnen – so passen Kreise und Linien immer zusammen. */
@@ -366,7 +523,8 @@
         bat_home: { g: line(nodes.battery, nodes.home), t: 0.5 },
         pv_grid: { g: line(nodes.pv, nodes.grid), t: 0.5 },
         pv_bat: { g: line(nodes.pv, nodes.battery), t: 0.5 },
-        grid_bat: { g: line(nodes.grid, nodes.battery), t: 0.5 },
+        // Zahl knapp unter der Linie, damit ein eigener Hausname darüber Platz hat
+        grid_bat: { g: line(nodes.grid, nodes.battery), at: [c[0], nodes.grid[1] + 12] },
       },
     };
   }
@@ -412,9 +570,11 @@
     .wrap { position: relative; margin: 0 auto; }
     svg { display: block; overflow: visible; }
     .flow { fill: none; stroke-width: 2; transition: stroke 0.3s; }
+    .hit { fill: none; stroke: transparent; stroke-width: 16; pointer-events: stroke; cursor: pointer; }
+    .label.clickable { cursor: pointer; }
     .footer {
       border-top: 1px solid var(--divider-color, rgba(127, 127, 127, 0.3));
-      padding: 4px 8px; display: flex; flex-wrap: wrap; gap: 4px;
+      padding: 8px; display: flex; flex-wrap: wrap; align-items: center; gap: 4px;
     }
     .footer a {
       color: var(--primary-color); text-decoration: none; font-weight: 500;
@@ -440,6 +600,15 @@
     }
     .node.clickable { cursor: pointer; }
     .node ha-icon { --mdc-icon-size: 24px; color: var(--primary-text-color); margin-bottom: 2px; }
+    .node .soc { font-size: 12px; line-height: 14px; color: var(--primary-text-color); }
+    .ratio-track { fill: none; stroke-width: 4.5; opacity: 0.2; }
+    .ratio-hit { fill: none; stroke: transparent; stroke-width: 8; pointer-events: stroke; }
+    .ratio.clickable { cursor: pointer; }
+    .ratio-arc { fill: none; stroke-width: 4.5; stroke-linecap: round; transition: stroke-dasharray 0.4s; }
+    .ratio-value { font-size: 11px; font-weight: 500; text-anchor: middle; dominant-baseline: central;
+                   font-family: var(--ha-font-family-body, Roboto, sans-serif); }
+    .ratio-legend { font-size: 11px; text-anchor: end; dominant-baseline: central;
+                    font-family: var(--ha-font-family-body, Roboto, sans-serif); }
     .node .v { font-size: 12px; line-height: 14px; white-space: nowrap; display: flex; align-items: center; justify-content: center; }
     .node .v ha-icon { --mdc-icon-size: 12px; color: inherit; margin: 0 1px 0 0; }
     .msg { padding: 16px; color: var(--secondary-text-color); }
@@ -495,6 +664,8 @@
         layout: "classic",
         show_zero_flows: false,
         show_zero_node_values: true,
+        show_ratios: false,
+        clickable_lines: true,
         link_energy_dashboard: true,
         link_power_helper: false,
       };
@@ -509,41 +680,78 @@
             required: true,
             selector: { device: { filter: [{ integration: DOMAIN, model: MAIN_MODEL }] } },
           },
-          { name: "title", selector: { text: {} } },
           {
-            name: "layout",
-            selector: {
-              select: {
-                mode: "box",
-                options: ["classic", "round", "triangle"].map((v) => ({
-                  value: v,
-                  label: t.layouts[v],
-                })),
-              },
-            },
-          },
-          // 0-W-Anzeige nebeneinander, die Links darunter in eigenen Zeilen
-          {
-            type: "grid",
+            type: "expandable",
             name: "",
+            title: t.editor.content,
+            icon: "mdi:text-short",
+            flatten: true,
             schema: [
-              { name: "show_zero_flows", selector: { boolean: {} } },
-              { name: "show_zero_node_values", selector: { boolean: {} } },
+              { name: "title", selector: { text: {} } },
+              {
+                name: "layout",
+                selector: {
+                  select: {
+                    mode: "box",
+                    options: ["classic", "round", "triangle"].map((v) => ({
+                      value: v,
+                      label: t.layouts[v],
+                    })),
+                  },
+                },
+              },
+              {
+                name: "battery_soc_entity",
+                selector: { entity: { filter: [{ domain: "sensor", device_class: "battery" }] } },
+              },
+              {
+                type: "grid",
+                name: "",
+                schema: [
+                  { name: "show_zero_flows", selector: { boolean: {} } },
+                  { name: "show_zero_node_values", selector: { boolean: {} } },
+                ],
+              },
+              { name: "show_ratios", selector: { boolean: {} } },
             ],
           },
           {
             type: "expandable",
             name: "",
-            title: t.editor.links,
-            icon: "mdi:link-variant",
+            title: t.editor.names,
+            icon: "mdi:rename-box",
             flatten: true,
             schema: [
+              {
+                type: "grid",
+                name: "",
+                schema: ["pv", "grid", "battery", "home", "self_consumption", "autarky"].map((n) => ({
+                  name: `name_${n}`,
+                  selector: { text: {} },
+                })),
+              },
+            ],
+          },
+          {
+            type: "expandable",
+            name: "",
+            title: t.editor.interactions,
+            icon: "mdi:gesture-tap",
+            flatten: true,
+            schema: [
+              { name: "clickable_lines", selector: { boolean: {} } },
               { name: "link_energy_dashboard", selector: { boolean: {} } },
               { name: "link_power_helper", selector: { boolean: {} } },
             ],
           },
         ],
         computeLabel: (schema) => t.editor[schema.name],
+        computeHelper: (schema) =>
+          schema.name === "battery_soc_entity"
+            ? t.helper.battery_soc_entity
+            : String(schema.name || "").startsWith("name_")
+              ? t.helper.name
+              : undefined,
       };
     }
 
@@ -553,6 +761,8 @@
       this._config = {
         show_zero_flows: false,
         show_zero_node_values: true,
+        show_ratios: false,
+        clickable_lines: true,
         link_energy_dashboard: true,
         link_power_helper: false,
         ...config,
@@ -593,6 +803,15 @@
       return map;
     }
 
+    /** Ladestand in % aus der optionalen SOC-Entität (null, wenn nicht gesetzt/verfügbar) */
+    _socValue() {
+      const id = this._config.battery_soc_entity;
+      const st = id && this._hass.states[id];
+      if (!st) return null;
+      const v = parseFloat(st.state);
+      return isFinite(v) ? v : null;
+    }
+
     _rawValues(map) {
       const raw = {};
       for (const key of Object.values(FLOW_KEYS)) {
@@ -622,7 +841,12 @@
         this._config.show_zero_flows,
         this._config.link_energy_dashboard,
         this._config.link_power_helper,
+        this._config.show_ratios,
+        this._config.clickable_lines,
         this._config.title || "",
+        ["pv", "grid", "battery", "home", "self_consumption", "autarky"].map(
+          (n) => this._config[`name_${n}`] || ""
+        ),
         present,
         languageOf(this._hass),
       ]);
@@ -632,7 +856,9 @@
         this._valueKey = null;
       }
       this._entities = map;
-      this._update(computeValues(this._rawValues(map)));
+      const values = computeValues(this._rawValues(map));
+      values.soc = this._socValue();
+      this._update(values);
     }
 
     _message(text) {
@@ -679,8 +905,10 @@
       const gNodes = mk("g");
       const gLabels = mk("g");
       const gNames = mk("g");
+      const gHits = mk("g"); // unsichtbare, breitere Klickflächen über den Linien
 
       const els = { lines: {}, nodes: {}, ring: [], values: {} };
+      const clickable = this._config.clickable_lines !== false;
 
       for (const l of lines) {
         const geo = L.flows[l.id];
@@ -701,7 +929,15 @@
         );
         const [lx, ly] = labelPoint(geo);
         const label = mk("text", { x: round1(lx), y: round1(ly), class: "label" }, gLabels);
-        els.lines[l.id] = { def: l, path, dot, anim, label, dur: null, reverse: null };
+        const item = { def: l, path, dot, anim, label, dur: null, reverse: null };
+        if (clickable) {
+          const hit = mk("path", { d, class: "hit" }, gHits);
+          const open = () => this._openLine(item);
+          hit.addEventListener("click", open);
+          label.addEventListener("click", open);
+          label.classList.add("clickable");
+        }
+        els.lines[l.id] = item;
       }
 
       for (const n of nodes) {
@@ -732,7 +968,7 @@
           }
         }
 
-        const pos = L.names[n];
+        const pos = namePosition(L, n, this._config);
         if (pos) {
           const name = mk(
             "text",
@@ -743,7 +979,7 @@
             },
             gNames
           );
-          name.textContent = t[n];
+          name.textContent = nodeName(this._config, n, t);
         }
 
         const div = document.createElement("div");
@@ -752,7 +988,18 @@
         div.style.top = `${cy - r}px`;
         div.style.width = `${2 * r}px`;
         div.style.height = `${2 * r}px`;
-        div.innerHTML = `<ha-icon icon="${ICONS[n]}"></ha-icon>`;
+        if (n === "battery") {
+          // Ladestand über dem Icon (nur sichtbar mit SOC-Entität)
+          const soc = document.createElement("div");
+          soc.className = "soc";
+          soc.style.display = "none";
+          div.appendChild(soc);
+          els.soc = soc;
+        }
+        const nodeIcon = document.createElement("ha-icon");
+        nodeIcon.setAttribute("icon", ICONS[n]);
+        div.appendChild(nodeIcon);
+        if (n === "battery") els.batteryIcon = nodeIcon;
         div.addEventListener("click", () => this._moreInfo(n));
         // Zeilen im Kreis: [Wert, Farbe, Pfeil-Icon wie im Energie-Dashboard]
         const rows = {
@@ -781,8 +1028,57 @@
           div.appendChild(v);
           els.values[key] = { el: text, row: v, hideable: n === "grid" || n === "battery" };
         }
+
         els.nodes[n] = div;
         wrap.appendChild(div);
+      }
+
+      // Kennzahlen-Ringe oben rechts (optional)
+      if (this._config.show_ratios) {
+        const scName = nodeName(this._config, "self_consumption", t);
+        const auName = nodeName(this._config, "autarky", t);
+        const R0 = ratioLayout(L, [scName, auName]);
+        const gRatio = mk("g");
+        els.legend = [];
+        // Je Kennzahl eine Gruppe aus Ring, Wert und Legende – als Ganzes anklickbar
+        const ring = (key, r, dy, name) => {
+          const color = RATIO_COLORS[key];
+          const g = mk("g", { class: "ratio" }, gRatio);
+          const circ = 2 * Math.PI * r;
+          const track = mk("circle", { cx: R0.cx, cy: R0.cy, r, class: "ratio-track" }, g);
+          track.style.stroke = color;
+          const arcEl = mk(
+            "circle",
+            {
+              cx: R0.cx,
+              cy: R0.cy,
+              r,
+              class: "ratio-arc",
+              transform: `rotate(-90 ${R0.cx} ${R0.cy})`,
+              "stroke-dasharray": `0 ${circ}`,
+            },
+            g
+          );
+          arcEl.style.stroke = color;
+          mk("circle", { cx: R0.cx, cy: R0.cy, r, class: "ratio-hit" }, g);
+          const text = mk("text", { x: R0.cx, y: R0.cy + dy, class: "ratio-value" }, g);
+          text.style.fill = color;
+          if (R0.legend && name) {
+            const el = mk("text", { x: R0.legendX, y: R0.cy + dy, class: "ratio-legend" }, g);
+            el.style.fill = color;
+            el.textContent = name;
+            els.legend.push({ el, full: name, max: R0.legendMax });
+          }
+          // Tooltip mit dem vollen Namen (auch wenn die Legende gekürzt oder ausgeblendet ist)
+          const tip = document.createElementNS(svgNS, "title");
+          tip.textContent = name || t[key];
+          g.appendChild(tip);
+          g.addEventListener("click", () => this._openRatio(key));
+          return { g, arc: arcEl, circ, text };
+        };
+        const sc = ring("self_consumption", R0.outer, -7, scName);
+        const au = ring("autarky", R0.inner, 7, auName);
+        els.ratios = { self_consumption: sc, autarky: au };
       }
 
       wrap.insertBefore(svg, wrap.firstChild);
@@ -801,9 +1097,18 @@
       if (links.length) {
         const footer = document.createElement("div");
         footer.className = "footer";
+        // Wie die Energieverteilung: <ha-button appearance="plain" size="s">
+        // (pillenförmig, Farben von HA); ohne ha-button (ältere HA/Vorschau) ein einfacher Link
+        const useButton = Boolean(customElements.get("ha-button"));
         for (const [text, path] of links) {
-          const a = document.createElement("a");
-          a.href = path;
+          const a = document.createElement(useButton ? "ha-button" : "a");
+          if (useButton) {
+            a.setAttribute("appearance", "plain");
+            a.setAttribute("size", "s");
+            a.setAttribute("href", path);
+          } else {
+            a.href = path;
+          }
           a.textContent = text;
           a.addEventListener("click", (ev) => {
             ev.preventDefault();
@@ -816,6 +1121,23 @@
       root.appendChild(card);
       this._els = els;
       this._layout = L;
+      this._fitLegend();
+    }
+
+    /** Legende bei Platzmangel mit ".." kürzen – mit der echten Textbreite im Browser */
+    _fitLegend() {
+      for (const { el, full, max } of (this._els && this._els.legend) || []) {
+        const measure = (text) => {
+          el.textContent = text;
+          try {
+            const w = el.getComputedTextLength();
+            return w > 0 || !text ? w : textWidth(text);
+          } catch (e) {
+            return textWidth(text);
+          }
+        };
+        el.textContent = truncateText(full, max, measure);
+      }
     }
 
     _update(values) {
@@ -866,6 +1188,30 @@
         div.classList.toggle("clickable", Boolean(this._moreInfoEntity(n)));
       }
 
+      // Akku: Icon nach Ladestand, SOC über dem Icon
+      if (this._els.batteryIcon) {
+        this._els.batteryIcon.setAttribute("icon", batteryIcon(values.soc));
+        const socText = formatSoc(values.soc, locale);
+        this._els.soc.textContent = socText;
+        this._els.soc.style.display = socText ? "" : "none";
+      }
+
+      // Kennzahlen-Ringe: PV-Eigenverbrauch (außen), Autarkie (innen)
+      if (this._els.ratios) {
+        const setRing = (ring, pct) => {
+          const len = pct == null ? 0 : (pct / 100) * ring.circ;
+          ring.arc.setAttribute("stroke-dasharray", `${len} ${ring.circ}`);
+          // Bei 0 % ausblenden, sonst bleibt durch das runde Linienende ein Punkt stehen
+          ring.arc.style.display = len > 0.5 ? "" : "none";
+          ring.text.textContent = pct == null ? "—" : formatPercent(pct, locale);
+        };
+        setRing(this._els.ratios.self_consumption, selfConsumption(values));
+        setRing(this._els.ratios.autarky, autarky(values));
+        for (const [key, ring] of Object.entries(this._els.ratios)) {
+          ring.g.classList.toggle("clickable", this._ratioClickable(key));
+        }
+      }
+
       // Ring ums Haus: Anteile von PV, Akku und Netz am Hausverbrauch
       if (this._els.ring.length) {
         const f = values.flows;
@@ -888,6 +1234,16 @@
       window.dispatchEvent(new CustomEvent("location-changed", { detail: { replace: false } }));
     }
 
+    /** Klick auf eine Linie: zugehörigen Fluss-Sensor öffnen */
+    _openLine(item) {
+      const key = lineSensorKey(item.def.id, Boolean(item.reverse));
+      const entityId = (this._entities || {})[key];
+      if (!entityId) return;
+      this.dispatchEvent(
+        new CustomEvent("hass-more-info", { detail: { entityId }, bubbles: true, composed: true })
+      );
+    }
+
     _moreInfoEntity(node) {
       const map = this._entities || {};
       for (const key of MORE_INFO[node] || []) {
@@ -900,9 +1256,47 @@
     _moreInfo(node) {
       const entityId = this._moreInfoEntity(node);
       if (!entityId) return;
+      this._fireMoreInfo(entityId);
+    }
+
+    _fireMoreInfo(entityId) {
       this.dispatchEvent(
         new CustomEvent("hass-more-info", { detail: { entityId }, bubbles: true, composed: true })
       );
+    }
+
+    /**
+     * Klick auf einen Kennzahlen-Ring. Die Sensoren sind standardmäßig deaktiviert und
+     * fehlen dann in hass.entities – ihre Entity-ID wird deshalb bei Bedarf aus der
+     * Entitäten-Registry gelesen (nur für Admins möglich). Der Dialog zeigt dann
+     * den deaktivierten Sensor und lässt sich dort direkt aktivieren.
+     */
+    async _openRatio(key) {
+      const active = this._moreInfoEntity(key);
+      if (active) return this._fireMoreInfo(active);
+      const entityId = await this._registryEntity(MORE_INFO[key] || []);
+      if (entityId) this._fireMoreInfo(entityId);
+    }
+
+    async _registryEntity(translationKeys) {
+      if (!this._hass || !this._hass.callWS || !(this._hass.user && this._hass.user.is_admin)) return null;
+      try {
+        const list = await this._hass.callWS({ type: "config/entity_registry/list" });
+        for (const tk of translationKeys) {
+          const hit = list.find(
+            (e) => e.platform === DOMAIN && e.device_id === this._config.device_id && e.translation_key === tk
+          );
+          if (hit) return hit.entity_id;
+        }
+      } catch (e) {
+        // ohne Rechte oder Verbindung: Klick ohne Wirkung
+      }
+      return null;
+    }
+
+    /** Ring anklickbar: Sensor aktiv – oder (deaktiviert) für Admins nachschlagbar */
+    _ratioClickable(key) {
+      return Boolean(this._moreInfoEntity(key) || (this._hass && this._hass.user && this._hass.user.is_admin));
     }
   }
 
@@ -918,6 +1312,18 @@
     pathD,
     pointAt,
     labelPoint,
+    batteryIcon,
+    formatSoc,
+    formatPercent,
+    autarky,
+    selfConsumption,
+    ratioLayout,
+    lineSensorKey,
+    nodeName,
+    namePosition,
+    textWidth,
+    truncateText,
+    HIDE_NAME,
   };
 
   if (!customElements.get(CARD_TYPE)) {

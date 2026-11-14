@@ -90,3 +90,30 @@ def compute_flows(*, netz: float, pv: float, batteries: list[BatteryFlow]) -> di
         "akku_zu_haus": akku_zu_haus,
         "akku_zu_netz": akku_zu_netz,
     }
+
+
+# Unterhalb dieser Leistung (W) ist ein Anteil nicht aussagekräftig → unbekannt
+RATIO_MIN_BASE = 0.5
+
+
+def _percent(part: float, base: float) -> float | None:
+    if base <= RATIO_MIN_BASE:
+        return None
+    return round(min(max(part / base, 0.0), 1.0) * 100, 1)
+
+
+def compute_ratios(flows: dict[str, float], pv: float) -> dict[str, float | None]:
+    """PV-Eigenverbrauch und Autarkiegrad in % (wie die Karte).
+
+    - PV-Eigenverbrauch: Anteil der PV-Leistung, der im Haus oder Akku bleibt.
+    - Autarkiegrad wie im Energie-Dashboard: 1 − Netzbezug / Hausverbrauch; zum
+      Netzbezug zählt auch das Laden des Akkus aus dem Netz.
+    Ohne PV-Leistung bzw. Hausverbrauch ist der Wert unbekannt (None).
+    """
+    haus = flows.get("haus", 0.0)
+    return {
+        "pv_eigenverbrauch": _percent(flows.get("pv_zu_haus", 0.0) + flows.get("pv_zu_akku", 0.0), pv),
+        "autarkiegrad": _percent(
+            haus - flows.get("netz_zu_haus", 0.0) - flows.get("netz_zu_akku", 0.0), haus
+        ),
+    }

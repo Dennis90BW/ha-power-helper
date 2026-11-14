@@ -10,3 +10,6 @@ __pycache__/
 tests/
 pytest.ini
 requirements_test.txt
+
+# Quelldateien fürs Logo (nicht im Repo)
+docs/images/brand-src/
